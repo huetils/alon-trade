@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "alon-trade"
+version = "0.1.0"
+description = ""
+authors = ["Hju Kneyck Flores <hjucode@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+isort = "^5.13.2"
+pytest = "^8.0"
+
+[tool.poetry.extras]
+all = ["alon_client", "alon_model"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
