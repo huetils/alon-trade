@@ -6,6 +6,8 @@ from typing import Any, Coroutine, Dict, List, Protocol, Union
 import ccxt.pro
 import numpy as np
 import talib
+from alon_client.candles import CandlestickChart
+from ccxt.base.exchange import Exchange
 from talib._ta_lib import MA_Type
 
 
@@ -82,7 +84,7 @@ class BollingerBandsStrategy(Strategy):
         :param symbol: Trading pair (e.g., 'BTC/USDT').
         :param close_prices: List of close prices.
         """
-        logging.info(f"Applying Bollinger Bands strategy to {symbol}")
+        self.logger.info(f"Applying Bollinger Bands strategy to {symbol}")
 
         if len(close_prices) >= self.length:
             bands = self.compute_bollinger_bands(close_prices)
@@ -98,24 +100,28 @@ class BollingerBandsStrategy(Strategy):
 
 
 async def fetch_ohlcv(
-    exchange: Any, symbol: str, timeframe: str
+    exchange: Exchange, symbol: str, timeframe: str
 ) -> Union[List[List[float]], Exception]:
     """
     Fetch OHLCV data for a symbol from an exchange.
 
     :param exchange: CCXT exchange instance.
     :param symbol: Trading pair (e.g., 'BTC/USDT').
-    :param timeframe: Timeframe for OHLCV data (e.g., '1m').
+    :param timeframe: Timeframe for OHLCV data (e.g., '15m').
     :return: Latest OHLCV data or an exception.
     """
     try:
-        return await exchange.watch_ohlcv(symbol, timeframe)
+        return await exchange.watch_ohlcv(symbol, timeframe)  # type: ignore
     except Exception as e:
         return e
 
 
 async def stream_ohlcv(
-    exchange: Any, symbols: List[str], strategy: Strategy, timeframe: str = "1m"
+    exchange: Exchange,
+    symbols: List[str],
+    strategy: Strategy,
+    chart: CandlestickChart,
+    timeframe: str = "15m",
 ) -> None:
     """
     Stream OHLCV data for the specified exchange and symbols.
@@ -123,12 +129,13 @@ async def stream_ohlcv(
     :param exchange: An instance of a CCXT exchange.
     :param symbols: List of trading pairs (e.g., ['BTC/USDT', 'ETH/USDT']).
     :param strategy: An instance of a class implementing the Strategy protocol.
-    :param timeframe: Timeframe for OHLCV data (default is '1m').
+    :param chart: Instance of the RealTimeCandlestickChart to visualize the data.
+    :param timeframe: Timeframe for OHLCV data (default is '15m').
     """
-    # Store close prices for each symbol
     price_data: Dict[str, List[float]] = {symbol: [] for symbol in symbols}
+    last_candle_timestamp: Dict[str, float] = {}
 
-    logging.info(f"Streaming OHLCV data for {exchange.id} {symbols}")
+    strategy.logger.info(f"Streaming OHLCV data for {exchange.id} {symbols}")
 
     try:
         while True:
@@ -145,14 +152,25 @@ async def stream_ohlcv(
                     continue
 
                 if len(result) > 0 and len(result[-1]) >= 5:
-                    close_prices = price_data[symbol]
-                    close_prices.append(result[-1][4])  # Append latest close price
+                    current_candle = result[-1]
+                    current_timestamp = current_candle[0]  # Candle timestamp
 
-                    if len(close_prices) > strategy.length:
-                        close_prices.pop(0)
+                    if (
+                        symbol not in last_candle_timestamp
+                        or current_timestamp != last_candle_timestamp[symbol]
+                    ):
+                        last_candle_timestamp[symbol] = current_timestamp
 
-                    # Apply strategy
-                    strategy.apply_strategy(symbol, close_prices)
+                        close_prices = price_data[symbol]
+                        close_prices.append(current_candle[4])
+
+                        if len(close_prices) > strategy.length:
+                            close_prices.pop(0)
+
+                        strategy.apply_strategy(symbol, close_prices)
+
+                        # Update the real-time candlestick chart
+                        chart.update_ohlcv(current_candle)
                 else:
                     strategy.logger.warning(
                         f"Unexpected OHLCV format for {symbol}: {result}"
@@ -162,10 +180,10 @@ async def stream_ohlcv(
         strategy.logger.error(f"Error in {exchange.id}: {e}")
 
     finally:
-        await exchange.close()
+        await exchange.session.close()
 
 
-async def initialize_exchange(exchange_id: str) -> Any:
+async def initialize_exchange(exchange_id: str) -> Exchange:
     """
     Initialize and return a CCXT Pro exchange instance.
 
@@ -186,19 +204,19 @@ async def main() -> None:
     logger = Logger.setup_logger()
     strategy = BollingerBandsStrategy(length=20, multiplier=2.0, logger=logger)
 
-    # Define exchanges and their symbols
-    exchanges: List[Dict[str, Any]] = [
-        {"id": "okx", "symbols": ["BTC/USDT", "ETH/USDT"]},
-        # {"id": "binance", "symbols": ["BTC/USDT", "ETH/USDT"]},
-        # {"id": "kraken", "symbols": ["BTC/USD", "ETH/USD"]},
-    ]
+    # Initialize the real-time candlestick chart
+    chart = CandlestickChart(timeframe="15m", max_candles=20, refresh_rate=1.0)
+
+    exchanges: List[Dict[str, Any]] = [{"id": "okx", "symbols": ["BTC/USDT"]}]
 
     tasks: List[Coroutine[Any, Any, None]] = []
 
     for exchange_info in exchanges:
         exchange = await initialize_exchange(exchange_info["id"])
         tasks.append(
-            stream_ohlcv(exchange, exchange_info["symbols"], strategy, timeframe="1m")
+            stream_ohlcv(
+                exchange, exchange_info["symbols"], strategy, chart, timeframe="15m"
+            )
         )
 
     await asyncio.gather(*tasks)
