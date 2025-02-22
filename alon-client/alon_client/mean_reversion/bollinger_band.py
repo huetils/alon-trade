@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
-from typing import Any, Coroutine, Dict, List, Protocol, Union
+from typing import Any, Coroutine, Protocol, Union
 
 import ccxt.pro
 import numpy as np
@@ -37,14 +37,13 @@ class Logger:
 
 
 class Strategy(Protocol):
-
     @property
     def length(self) -> int: ...
 
     @property
     def logger(self) -> logging.Logger: ...
 
-    def apply_strategy(self, symbol: str, close_prices: List[float]) -> None: ...
+    def apply_strategy(self, symbol: str, close_prices: list[float]) -> None: ...
 
 
 class BollingerBandsStrategy(Strategy):
@@ -61,11 +60,11 @@ class BollingerBandsStrategy(Strategy):
     def logger(self) -> logging.Logger:
         return self._logger
 
-    def compute_bollinger_bands(self, close_prices: List[float]) -> Dict[str, float]:
+    def compute_bollinger_bands(self, close_prices: list[float]) -> dict[str, float]:
         """
         Compute Bollinger Bands using TA-Lib.
 
-        :param close_prices: List of close prices.
+        :param close_prices: list of close prices.
         :return: A dictionary containing the upper, middle, and lower bands.
         """
         upper, middle, lower = talib.BBANDS(
@@ -77,12 +76,12 @@ class BollingerBandsStrategy(Strategy):
         )
         return {"upper": upper[-1], "middle": middle[-1], "lower": lower[-1]}
 
-    def apply_strategy(self, symbol: str, close_prices: List[float]) -> None:
+    def apply_strategy(self, symbol: str, close_prices: list[float]) -> None:
         """
         Apply the Bollinger Bands strategy to generate buy/sell signals.
 
         :param symbol: Trading pair (e.g., 'BTC/USDT').
-        :param close_prices: List of close prices.
+        :param close_prices: list of close prices.
         """
         self.logger.info(f"Applying Bollinger Bands strategy to {symbol}")
 
@@ -101,7 +100,7 @@ class BollingerBandsStrategy(Strategy):
 
 async def fetch_ohlcv(
     exchange: Exchange, symbol: str, timeframe: str
-) -> Union[List[List[float]], Exception]:
+) -> Union[list[list[float]], Exception]:
     """
     Fetch OHLCV data for a symbol from an exchange.
 
@@ -118,7 +117,7 @@ async def fetch_ohlcv(
 
 async def stream_ohlcv(
     exchange: Exchange,
-    symbols: List[str],
+    symbols: list[str],
     strategy: Strategy,
     chart: CandlestickChart,
     timeframe: str = "15m",
@@ -127,13 +126,13 @@ async def stream_ohlcv(
     Stream OHLCV data for the specified exchange and symbols.
 
     :param exchange: An instance of a CCXT exchange.
-    :param symbols: List of trading pairs (e.g., ['BTC/USDT', 'ETH/USDT']).
+    :param symbols: list of trading pairs (e.g., ['BTC/USDT', 'ETH/USDT']).
     :param strategy: An instance of a class implementing the Strategy protocol.
     :param chart: Instance of the RealTimeCandlestickChart to visualize the data.
     :param timeframe: Timeframe for OHLCV data (default is '15m').
     """
-    price_data: Dict[str, List[float]] = {symbol: [] for symbol in symbols}
-    last_candle_timestamp: Dict[str, float] = {}
+    price_data: dict[str, list[float]] = {symbol: [] for symbol in symbols}
+    last_candle_timestamp: dict[str, float] = {}
 
     strategy.logger.info(f"Streaming OHLCV data for {exchange.id} {symbols}")
 
@@ -207,9 +206,9 @@ async def main() -> None:
     # Initialize the real-time candlestick chart
     chart = CandlestickChart(timeframe="15m", max_candles=20, refresh_rate=1.0)
 
-    exchanges: List[Dict[str, Any]] = [{"id": "okx", "symbols": ["BTC/USDT"]}]
+    exchanges: list[dict[str, Any]] = [{"id": "okx", "symbols": ["BTC/USDT"]}]
 
-    tasks: List[Coroutine[Any, Any, None]] = []
+    tasks: list[Coroutine[Any, Any, None]] = []
 
     for exchange_info in exchanges:
         exchange = await initialize_exchange(exchange_info["id"])

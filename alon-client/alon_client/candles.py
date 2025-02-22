@@ -1,7 +1,7 @@
 import datetime
 import threading
 import time
-from typing import Any, Dict, List
+from typing import Any
 
 import plotext as plt
 
@@ -19,7 +19,7 @@ class CandlestickChart:
         """
         self.refresh_rate: float = refresh_rate
         self.max_candles: int = max_candles
-        self.candles: List[Dict[str, Any]] = []  # List of candle dictionaries
+        self.candles: list[dict[str, Any]] = []  # list of candle dictionaries
         self._lock: threading.Lock = threading.Lock()
 
         # Parse timeframe (assumes format like "15m")
@@ -48,7 +48,7 @@ class CandlestickChart:
             candle_start_seconds, tz=datetime.timezone.utc
         )
 
-    def update_ohlcv(self, ohlcv: List[float]) -> None:
+    def update_ohlcv(self, ohlcv: list[float]) -> None:
         """
         Updates the internal state with new OHLCV data.
 
@@ -66,14 +66,14 @@ class CandlestickChart:
         with self._lock:
             # If we already have a candle for this period, update it
             if self.candles and self.candles[-1]["timestamp"] == candle_start:
-                current: Dict[str, Any] = self.candles[-1]
+                current: dict[str, Any] = self.candles[-1]
                 current["high"] = max(current["high"], ohlcv[2])
                 current["low"] = min(current["low"], ohlcv[3])
                 current["close"] = ohlcv[4]
                 current["volume"] += ohlcv[5]
             else:
                 # Create a new candle
-                new_candle: Dict[str, Any] = {
+                new_candle: dict[str, Any] = {
                     "timestamp": candle_start,
                     "open": ohlcv[1],
                     "high": ohlcv[2],
@@ -100,16 +100,16 @@ class CandlestickChart:
                 return
 
             # Convert timestamps to Unix time (seconds)
-            timestamps: List[float] = [
+            timestamps: list[float] = [
                 candle["timestamp"].timestamp() for candle in self.candles
             ]
-            opens: List[float] = [candle["open"] for candle in self.candles]
-            highs: List[float] = [candle["high"] for candle in self.candles]
-            lows: List[float] = [candle["low"] for candle in self.candles]
-            closes: List[float] = [candle["close"] for candle in self.candles]
+            opens: list[float] = [candle["open"] for candle in self.candles]
+            highs: list[float] = [candle["high"] for candle in self.candles]
+            lows: list[float] = [candle["low"] for candle in self.candles]
+            closes: list[float] = [candle["close"] for candle in self.candles]
 
         # Package the OHLC data into a dictionary as required by Plotext
-        ohlc_data: Dict[str, List[float]] = {
+        ohlc_data: dict[str, list[float]] = {
             "Open": opens,
             "High": highs,
             "Low": lows,

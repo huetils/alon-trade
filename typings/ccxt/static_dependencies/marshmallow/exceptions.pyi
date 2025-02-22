@@ -6,10 +6,11 @@ import typing
 
 """Exception classes for marshmallow-related errors."""
 SCHEMA = ...
+
 class MarshmallowError(Exception):
     """Base class for all marshmallow-related errors."""
-    ...
 
+    ...
 
 class ValidationError(MarshmallowError):
     """Raised when validation fails on a field or schema.
@@ -23,32 +24,36 @@ class ValidationError(MarshmallowError):
     :param data: Raw input data.
     :param valid_data: Valid (de)serialized data.
     """
-    def __init__(self, message: str | list | dict, field_name: str = ..., data: typing.Mapping[str, typing.Any] | typing.Iterable[typing.Mapping[str, typing.Any]] | None = ..., valid_data: list[dict[str, typing.Any]] | dict[str, typing.Any] | None = ..., **kwargs) -> None:
+    def __init__(
+        self,
+        message: str | list | dict,
+        field_name: str = ...,
+        data: typing.Mapping[str, typing.Any]
+        | typing.Iterable[typing.Mapping[str, typing.Any]]
+        | None = ...,
+        valid_data: list[dict[str, typing.Any]] | dict[str, typing.Any] | None = ...,
+        **kwargs,
+    ) -> None: ...
+    def normalized_messages(
+        self,
+    ):  # -> dict[Any, Any] | dict[str, list[str] | list[Any] | dict[Any, Any]]:
         ...
-    
-    def normalized_messages(self): # -> dict[Any, Any] | dict[str, list[str] | list[Any] | dict[Any, Any]]:
-        ...
-    
     @property
-    def messages_dict(self) -> dict[str, typing.Any]:
-        ...
-    
-
+    def messages_dict(self) -> dict[str, typing.Any]: ...
 
 class RegistryError(NameError):
     """Raised when an invalid operation is performed on the serializer
     class registry.
     """
-    ...
 
+    ...
 
 class StringNotCollectionError(MarshmallowError, TypeError):
     """Raised when a string is passed when a list of strings is expected."""
-    ...
 
+    ...
 
 class FieldInstanceResolutionError(MarshmallowError, TypeError):
     """Raised when schema to instantiate is neither a Schema class nor an instance."""
+
     ...
-
-

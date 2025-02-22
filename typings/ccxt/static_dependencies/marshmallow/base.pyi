@@ -13,38 +13,35 @@ These are necessary to avoid circular imports between schema.py and fields.py.
     This module is treated as private API.
     Users should not need to use this module directly.
 """
+
 class FieldABC(ABC):
     """Abstract base class from which all Field classes inherit."""
+
     parent = ...
     name = ...
     root = ...
     @abstractmethod
-    def serialize(self, attr, obj, accessor=...): # -> None:
+    def serialize(self, attr, obj, accessor=...):  # -> None:
         ...
-    
     @abstractmethod
-    def deserialize(self, value): # -> None:
+    def deserialize(self, value):  # -> None:
         ...
-    
-
 
 class SchemaABC(ABC):
     """Abstract base class from which all Schemas inherit."""
     @abstractmethod
-    def dump(self, obj, *, many: bool | None = ...): # -> None:
+    def dump(self, obj, *, many: bool | None = ...):  # -> None:
         ...
-    
     @abstractmethod
-    def dumps(self, obj, *, many: bool | None = ...): # -> None:
+    def dumps(self, obj, *, many: bool | None = ...):  # -> None:
         ...
-    
     @abstractmethod
-    def load(self, data, *, many: bool | None = ..., partial=..., unknown=...): # -> None:
+    def load(
+        self, data, *, many: bool | None = ..., partial=..., unknown=...
+    ):  # -> None:
         ...
-    
     @abstractmethod
-    def loads(self, json_data, *, many: bool | None = ..., partial=..., unknown=..., **kwargs): # -> None:
+    def loads(
+        self, json_data, *, many: bool | None = ..., partial=..., unknown=..., **kwargs
+    ):  # -> None:
         ...
-    
-
-

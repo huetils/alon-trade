@@ -3,7 +3,7 @@ import sqlite3
 import threading
 from datetime import datetime, timezone
 from queue import Queue
-from typing import Any, Coroutine, Dict, List, Tuple
+from typing import Any, Coroutine, Tuple, dict, list
 
 import ccxt.pro
 
@@ -42,7 +42,7 @@ def database_writer() -> None:
     conn: sqlite3.Connection = sqlite3.connect(DB_NAME)
     cursor: sqlite3.Cursor = conn.cursor()
     while True:
-        data: List[Tuple[str, str, str, str, str, float, float]] = []
+        data: list[Tuple[str, str, str, str, str, float, float]] = []
         while not data_queue.empty():
             data.append(data_queue.get())
         if data:
@@ -67,17 +67,17 @@ def start_database_writer() -> None:
 
 
 # Fetch L1 and L2 data asynchronously using websockets
-async def fetch_order_book(exchange_id: str, symbols: List[str]) -> None:
+async def fetch_order_book(exchange_id: str, symbols: list[str]) -> None:
     exchange: Any = getattr(ccxt.pro, exchange_id)()
 
     try:
         while True:
-            tasks: List[asyncio.Future[Any]] = []
+            tasks: list[asyncio.Future[Any]] = []
             for symbol in symbols:
                 tasks.append(exchange.watch_order_book(symbol))
 
             # Gather all updates in parallel
-            results: List[Any] = await asyncio.gather(*tasks, return_exceptions=True)
+            results: list[Any] = await asyncio.gather(*tasks, return_exceptions=True)
             timestamp: str = datetime.now(timezone.utc).isoformat()
 
             for idx, order_book in enumerate(results):
@@ -88,7 +88,7 @@ async def fetch_order_book(exchange_id: str, symbols: List[str]) -> None:
                     continue
 
                 symbol: str = symbols[idx]
-                data: List[Tuple[str, str, str, str, str, float, float]] = []
+                data: list[Tuple[str, str, str, str, str, float, float]] = []
 
                 # L1 Data
                 if "bids" in order_book and len(order_book["bids"]) > 0:
@@ -145,7 +145,7 @@ async def main() -> None:
     setup_database()
     start_database_writer()
 
-    exchanges: List[Dict[str, Any]] = [
+    exchanges: list[dict[str, Any]] = [
         {"id": "bybit", "symbols": ["BTC/USDT", "ETH/USDT"]},
         {"id": "bitget", "symbols": ["BTC/USDT", "ETH/USDT"]},
         {"id": "okx", "symbols": ["BTC/USDT", "ETH/USDT"]},
@@ -153,7 +153,7 @@ async def main() -> None:
         {"id": "kraken", "symbols": ["BTC/USD", "ETH/USD"]},
     ]
 
-    tasks: List[Coroutine[Any, Any, None]] = []
+    tasks: list[Coroutine[Any, Any, None]] = []
     for exchange in exchanges:
         tasks.append(fetch_order_book(exchange["id"], exchange["symbols"]))
 

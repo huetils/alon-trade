@@ -6,30 +6,21 @@ from .utils import StrAndRepr
 
 class ParseError(StrAndRepr, Exception):
     """A call to ``Expression.parse()`` or ``match()`` didn't match."""
-    def __init__(self, text, pos=..., expr=...) -> None:
-        ...
-    
-    def __str__(self) -> str:
-        ...
-    
+    def __init__(self, text, pos=..., expr=...) -> None: ...
+    def __str__(self) -> str: ...
     def line(self):
         """Return the 1-based line number where the expression ceased to
         match."""
         ...
-    
-    def column(self): # -> int:
+
+    def column(self):  # -> int:
         """Return the 1-based column where the expression ceased to match."""
         ...
-    
-
 
 class IncompleteParseError(ParseError):
     """A call to ``parse()`` matched a whole Expression but did not consume the
     entire text."""
-    def __str__(self) -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
 
 class VisitationError(Exception):
     """Something went wrong while traversing a parse tree.
@@ -48,8 +39,6 @@ class VisitationError(Exception):
 
         """
         ...
-    
-
 
 class BadGrammar(StrAndRepr, Exception):
     """Something was wrong with the definition of a grammar.
@@ -58,8 +47,8 @@ class BadGrammar(StrAndRepr, Exception):
     grammar definition syntax.
 
     """
-    ...
 
+    ...
 
 class UndefinedLabel(BadGrammar):
     """A rule referenced in a grammar was never defined.
@@ -68,11 +57,5 @@ class UndefinedLabel(BadGrammar):
     stuff at some point.
 
     """
-    def __init__(self, label) -> None:
-        ...
-    
-    def __str__(self) -> str:
-        ...
-    
-
-
+    def __init__(self, label) -> None: ...
+    def __str__(self) -> str: ...

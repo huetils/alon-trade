@@ -10,4 +10,3 @@ def abbr(value: Any, limit: int = ...) -> str:
     representation based on the given length `limit` if necessary.
     """
     ...
-

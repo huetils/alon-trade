@@ -11,7 +11,10 @@ Although the name 'intfunc' was chosen to represent functions that
 work with integers, it can also be thought of as containing
 internal/core functions that are needed by the classes of the core.
 """
-def igcdex(a, b): # -> tuple[Literal[0], Literal[1], Literal[0]] | tuple[int | Any, int | Any, int | Any]:
+
+def igcdex(
+    a, b
+):  # -> tuple[Literal[0], Literal[1], Literal[0]] | tuple[int | Any, int | Any, int | Any]:
     """Returns x, y, g such that g = x*a + y*b = gcd(a, b).
 
     Examples
@@ -31,4 +34,3 @@ def igcdex(a, b): # -> tuple[Literal[0], Literal[1], Literal[0]] | tuple[int | A
 
     """
     ...
-

@@ -9,6 +9,7 @@ spit out a useful value. Or you can walk it yourself; the structural attributes
 are public.
 
 """
+
 class Node:
     """A parse tree node
 
@@ -25,15 +26,12 @@ class Node:
     another.
 
     """
+
     __slots__ = ...
-    def __init__(self, expr, full_text, start, end, children=...) -> None:
-        ...
-    
+    def __init__(self, expr, full_text, start, end, children=...) -> None: ...
     @property
-    def expr_name(self):
-        ...
-    
-    def __iter__(self): # -> Iterator[Any]:
+    def expr_name(self): ...
+    def __iter__(self):  # -> Iterator[Any]:
         """Support looping over my children and doing tuple unpacks on me.
 
         It can be very handy to unpack nodes in arg lists; see
@@ -41,37 +39,33 @@ class Node:
 
         """
         ...
-    
+
     @property
     def text(self):
         """Return the text this node matched."""
         ...
-    
-    def prettily(self, error=...): # -> str:
+
+    def prettily(self, error=...):  # -> str:
         """Return a unicode, pretty-printed representation of me.
 
         :arg error: The node to highlight because an error occurred there
 
         """
         ...
-    
+
     def __str__(self) -> str:
         """Return a compact, human-readable representation of me."""
         ...
-    
+
     def __eq__(self, other) -> bool:
         """Support by-value deep comparison with other nodes for testing."""
         ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
-    def __repr__(self, top_level=...): # -> str:
+
+    def __ne__(self, other) -> bool: ...
+    def __repr__(self, top_level=...):  # -> str:
         """Return a bit of code (though not an expression) that will recreate
         me."""
         ...
-    
-
 
 class RegexNode(Node):
     """Node returned from a ``Regex`` expression
@@ -80,14 +74,12 @@ class RegexNode(Node):
     capturing groups, etc.
 
     """
+
     __slots__ = ...
 
-
 class RuleDecoratorMeta(type):
-    def __new__(metaclass, name, bases, namespace): # -> Self:
+    def __new__(metaclass, name, bases, namespace):  # -> Self:
         ...
-    
-
 
 class NodeVisitor(metaclass=RuleDecoratorMeta):
     """A shell for writing things that turn parse trees into something useful
@@ -112,9 +104,10 @@ class NodeVisitor(metaclass=RuleDecoratorMeta):
       Heaven forbid you're making it into a string or something else.
 
     """
+
     grammar = ...
     unwrapped_exceptions = ...
-    def visit(self, node): # -> Any:
+    def visit(self, node):  # -> Any:
         """Walk a parse tree, transforming it into another representation.
 
         Recursively descend a parse tree, dispatching to the method named after
@@ -129,7 +122,7 @@ class NodeVisitor(metaclass=RuleDecoratorMeta):
 
         """
         ...
-    
+
     def generic_visit(self, node, visited_children):
         """Default visitor method
 
@@ -143,8 +136,8 @@ class NodeVisitor(metaclass=RuleDecoratorMeta):
 
         """
         ...
-    
-    def parse(self, text, pos=...): # -> Any:
+
+    def parse(self, text, pos=...):  # -> Any:
         """Parse some text with this Visitor's default grammar and return the
         result of visiting it.
 
@@ -153,8 +146,8 @@ class NodeVisitor(metaclass=RuleDecoratorMeta):
 
         """
         ...
-    
-    def match(self, text, pos=...): # -> Any:
+
+    def match(self, text, pos=...):  # -> Any:
         """Parse and visit some text with this Visitor's default grammar, but
         don't insist on parsing all the way to the end.
 
@@ -163,14 +156,12 @@ class NodeVisitor(metaclass=RuleDecoratorMeta):
 
         """
         ...
-    
+
     def lift_child(self, node, children):
         """Lift the sole child of ``node`` up to replace the node."""
         ...
-    
 
-
-def rule(rule_string): # -> Callable[..., Any]:
+def rule(rule_string):  # -> Callable[..., Any]:
     """Decorate a NodeVisitor ``visit_*`` method to tie a grammar rule to it.
 
     The following will arrange for the ``visit_digit`` method to receive the
@@ -203,4 +194,3 @@ def rule(rule_string): # -> Callable[..., Any]:
 
     """
     ...
-

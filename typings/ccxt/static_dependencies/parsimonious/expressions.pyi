@@ -10,10 +10,10 @@ These do the parsing.
 
 """
 MARKER = ...
-def is_callable(value): # -> bool:
-    ...
 
-def expression(callable, rule_name, grammar): # -> AdHocExpression:
+def is_callable(value):  # -> bool:
+    ...
+def expression(callable, rule_name, grammar):  # -> AdHocExpression:
     """Turn a plain callable into an Expression.
 
     The callable can be of this simple form::
@@ -51,26 +51,16 @@ def expression(callable, rule_name, grammar): # -> AdHocExpression:
         part of, to make delegating to other rules possible
 
     """
-    class AdHocExpression(Expression):
-        ...
-    
-    
+    class AdHocExpression(Expression): ...
 
 class Expression(StrAndRepr):
     """A thing that can be matched against a piece of text"""
+
     __slots__ = ...
-    def __init__(self, name=...) -> None:
-        ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
-    def __ne__(self, other) -> bool:
-        ...
-    
+    def __init__(self, name=...) -> None: ...
+    def __hash__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
+    def __ne__(self, other) -> bool: ...
     def parse(self, text, pos=...):
         """Return a parse tree of ``text``.
 
@@ -80,7 +70,7 @@ class Expression(StrAndRepr):
 
         """
         ...
-    
+
     def match(self, text, pos=...):
         """Return the parse tree matching this expression at the given
         position, not necessarily extending all the way to the end of ``text``.
@@ -91,7 +81,7 @@ class Expression(StrAndRepr):
 
         """
         ...
-    
+
     def match_core(self, text, pos, cache, error):
         """Internal guts of ``match()``
 
@@ -111,19 +101,15 @@ class Expression(StrAndRepr):
 
         """
         ...
-    
-    def __str__(self) -> str:
-        ...
-    
-    def as_rule(self): # -> str:
+
+    def __str__(self) -> str: ...
+    def as_rule(self):  # -> str:
         """Return the left- and right-hand sides of a rule that represents me.
 
         Return unicode. If I have no ``name``, omit the left-hand side.
 
         """
         ...
-    
-
 
 class Literal(Expression):
     """A string literal
@@ -131,11 +117,9 @@ class Literal(Expression):
     Use these if you can; they're the fastest.
 
     """
-    __slots__ = ...
-    def __init__(self, literal, name=...) -> None:
-        ...
-    
 
+    __slots__ = ...
+    def __init__(self, literal, name=...) -> None: ...
 
 class TokenMatcher(Literal):
     """An expression matching a single token of a given type
@@ -143,8 +127,8 @@ class TokenMatcher(Literal):
     This is for use only with TokenGrammars.
 
     """
-    ...
 
+    ...
 
 class Regex(Expression):
     """An expression that matches what a regex does.
@@ -153,26 +137,31 @@ class Regex(Expression):
     they're fast.
 
     """
-    __slots__ = ...
-    def __init__(self, pattern, name=..., ignore_case=..., locale=..., multiline=..., dot_all=..., unicode=..., verbose=..., ascii=...) -> None:
-        ...
-    
 
+    __slots__ = ...
+    def __init__(
+        self,
+        pattern,
+        name=...,
+        ignore_case=...,
+        locale=...,
+        multiline=...,
+        dot_all=...,
+        unicode=...,
+        verbose=...,
+        ascii=...,
+    ) -> None: ...
 
 class Compound(Expression):
     """An abstract expression which contains other expressions"""
+
     __slots__ = ...
     def __init__(self, *members, **kwargs) -> None:
         """``members`` is a sequence of expressions."""
         ...
-    
-    def __hash__(self) -> int:
-        ...
-    
-    def __eq__(self, other) -> bool:
-        ...
-    
 
+    def __hash__(self) -> int: ...
+    def __eq__(self, other) -> bool: ...
 
 class Sequence(Compound):
     """A series of expressions that must match contiguous, ordered pieces of
@@ -182,8 +171,8 @@ class Sequence(Compound):
     after another.
 
     """
-    ...
 
+    ...
 
 class OneOf(Compound):
     """A series of expressions, one of which must match
@@ -192,14 +181,14 @@ class OneOf(Compound):
     wins.
 
     """
-    ...
 
+    ...
 
 class Lookahead(Compound):
     """An expression which consumes nothing, even if its contained expression
     succeeds"""
-    ...
 
+    ...
 
 class Not(Compound):
     """An expression that succeeds only if the expression within it doesn't
@@ -207,8 +196,8 @@ class Not(Compound):
     In any case, it never consumes any characters; it's a negative lookahead.
 
     """
-    ...
 
+    ...
 
 class Optional(Compound):
     """An expression that succeeds whether or not the contained one does
@@ -217,13 +206,13 @@ class Optional(Compound):
     consumes. Otherwise, it consumes nothing.
 
     """
-    ...
 
+    ...
 
 class ZeroOrMore(Compound):
     """An expression wrapper like the * quantifier in regexes."""
-    ...
 
+    ...
 
 class OneOrMore(Compound):
     """An expression wrapper like the + quantifier in regexes.
@@ -232,9 +221,6 @@ class OneOrMore(Compound):
     more", "3 or more", etc.
 
     """
+
     __slots__ = ...
-    def __init__(self, member, name=..., min=...) -> None:
-        ...
-    
-
-
+    def __init__(self, member, name=..., min=...) -> None: ...

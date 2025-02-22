@@ -10,22 +10,19 @@ EXCLUDE = ...
 INCLUDE = ...
 RAISE = ...
 _UNKNOWN_VALUES = ...
-class _Missing:
-    def __bool__(self): # -> Literal[False]:
-        ...
-    
-    def __copy__(self): # -> Self:
-        ...
-    
-    def __deepcopy__(self, _): # -> Self:
-        ...
-    
-    def __repr__(self): # -> Literal['<marshmallow.missing>']:
-        ...
-    
 
+class _Missing:
+    def __bool__(self):  # -> Literal[False]:
+        ...
+    def __copy__(self):  # -> Self:
+        ...
+    def __deepcopy__(self, _):  # -> Self:
+        ...
+    def __repr__(self):  # -> Literal['<marshmallow.missing>']:
+        ...
 
 missing = ...
+
 def is_generator(obj) -> bool:
     """Return True if ``obj`` is a generator"""
     ...
@@ -58,9 +55,7 @@ def pprint(obj, *args, **kwargs) -> None:
     """
     ...
 
-def is_aware(datetime: dt.datetime) -> bool:
-    ...
-
+def is_aware(datetime: dt.datetime) -> bool: ...
 def from_rfc(datestring: str) -> dt.datetime:
     """Parse a RFC822-formatted datetime string and return a datetime object.
 
@@ -78,11 +73,12 @@ def rfcformat(datetime: dt.datetime) -> str:
 _iso8601_datetime_re = ...
 _iso8601_date_re = ...
 _iso8601_time_re = ...
+
 def get_fixed_timezone(offset: int | float | dt.timedelta) -> dt.timezone:
     """Return a tzinfo instance with a fixed offset from UTC."""
     ...
 
-def from_iso_datetime(value): # -> datetime:
+def from_iso_datetime(value):  # -> datetime:
     """Parse a string and return a datetime.datetime.
 
     This function supports time zone offsets. When the input contains one,
@@ -90,29 +86,21 @@ def from_iso_datetime(value): # -> datetime:
     """
     ...
 
-def from_iso_time(value): # -> time:
+def from_iso_time(value):  # -> time:
     """Parse a string and return a datetime.time.
 
     This function doesn't support time zone offsets.
     """
     ...
 
-def from_iso_date(value): # -> date:
+def from_iso_date(value):  # -> date:
     """Parse a string and return a datetime.date."""
     ...
 
-def from_timestamp(value: typing.Any) -> dt.datetime:
-    ...
-
-def from_timestamp_ms(value: typing.Any) -> dt.datetime:
-    ...
-
-def timestamp(value: dt.datetime) -> float:
-    ...
-
-def timestamp_ms(value: dt.datetime) -> float:
-    ...
-
+def from_timestamp(value: typing.Any) -> dt.datetime: ...
+def from_timestamp_ms(value: typing.Any) -> dt.datetime: ...
+def timestamp(value: dt.datetime) -> float: ...
+def timestamp_ms(value: dt.datetime) -> float: ...
 def isoformat(datetime: dt.datetime) -> str:
     """Return the ISO8601-formatted representation of a datetime object.
 
@@ -120,16 +108,10 @@ def isoformat(datetime: dt.datetime) -> str:
     """
     ...
 
-def to_iso_time(time: dt.time) -> str:
-    ...
-
-def to_iso_date(date: dt.date) -> str:
-    ...
-
-def ensure_text_type(val: str | bytes) -> str:
-    ...
-
-def pluck(dictlist: list[dict[str, typing.Any]], key: str): # -> list[Any]:
+def to_iso_time(time: dt.time) -> str: ...
+def to_iso_date(date: dt.date) -> str: ...
+def ensure_text_type(val: str | bytes) -> str: ...
+def pluck(dictlist: list[dict[str, typing.Any]], key: str):  # -> list[Any]:
     """Extracts a list of dictionary values from a list of dictionaries.
     ::
 
@@ -139,7 +121,7 @@ def pluck(dictlist: list[dict[str, typing.Any]], key: str): # -> list[Any]:
     """
     ...
 
-def get_value(obj, key: int | str, default=...): # -> Any:
+def get_value(obj, key: int | str, default=...):  # -> Any:
     """Helper for pulling a keyed value off various types of objects. Fields use
     this method by default to access attributes of the source object. For object `x`
     and attribute `i`, this method first tries to access `x[i]`, and then falls back to
@@ -152,7 +134,7 @@ def get_value(obj, key: int | str, default=...): # -> Any:
     """
     ...
 
-def set_value(dct: dict[str, typing.Any], key: str, value: typing.Any): # -> None:
+def set_value(dct: dict[str, typing.Any], key: str, value: typing.Any):  # -> None:
     """Set a value in a dict. If `key` contains a '.', it is assumed
     be a path (i.e. dot-delimited string) to the value's location.
 
@@ -165,7 +147,7 @@ def set_value(dct: dict[str, typing.Any], key: str, value: typing.Any): # -> Non
     """
     ...
 
-def callable_or_raise(obj): # -> Callable[..., object]:
+def callable_or_raise(obj):  # -> Callable[..., object]:
     """Check that an object is callable, else raise a :exc:`TypeError`."""
     ...
 
@@ -178,7 +160,7 @@ def get_func_args(func: typing.Callable) -> list[str]:
     """
     ...
 
-def resolve_field_instance(cls_or_instance): # -> FieldABC:
+def resolve_field_instance(cls_or_instance):  # -> FieldABC:
     """Return a Schema instance from a Schema class or instance.
 
     :param type|Schema cls_or_instance: Marshmallow Schema class or instance.
@@ -192,6 +174,4 @@ def timedelta_to_microseconds(value: dt.timedelta) -> int:
     """
     ...
 
-def validate_unknown_parameter_value(obj: typing.Any) -> str:
-    ...
-
+def validate_unknown_parameter_value(obj: typing.Any) -> str: ...

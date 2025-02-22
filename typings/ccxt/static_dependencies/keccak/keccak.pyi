@@ -18,6 +18,7 @@ Some caveats about the implementation:
 [1] http://keccak.noekeon.org/
 [2] https://git.io/vKfkb
 """
+
 def keccak_f_1600(state):
     """The inner permutation for the Keccak sponge function.
 
@@ -54,7 +55,7 @@ def keccak_f_1600(state):
     """
     ...
 
-def Keccak(r, c, _input, suffix, output_len): # -> bytearray:
+def Keccak(r, c, _input, suffix, output_len):  # -> bytearray:
     """
     The general sponge function, consisting of the inner permutation and a
     padding rule (`pad10*1`). It consists of three main parts.
@@ -79,7 +80,7 @@ def Keccak(r, c, _input, suffix, output_len): # -> bytearray:
     """
     ...
 
-def SHA3(_input): # -> bytearray:
+def SHA3(_input):  # -> bytearray:
     """
     FIPS 202 generalized instance of the SHA-3 hash function.
 
@@ -91,4 +92,3 @@ def SHA3(_input): # -> bytearray:
         Instance of the Keccak permutation that calculates the hash.
     """
     ...
-

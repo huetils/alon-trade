@@ -8,16 +8,16 @@ class EncodingError(Exception):
     """
     Base exception for any error that occurs during encoding.
     """
-    ...
 
+    ...
 
 class EncodingTypeError(EncodingError):
     """
     Raised when trying to encode a python value whose type is not supported for
     the output ABI type.
     """
-    ...
 
+    ...
 
 class IllegalValue(EncodingError):
     """
@@ -31,8 +31,8 @@ class IllegalValue(EncodingError):
         fixed128x19_encoder(Decimal('NaN'))  # cannot encode NaN
 
     """
-    ...
 
+    ...
 
 class ValueOutOfBounds(IllegalValue):
     """
@@ -47,39 +47,36 @@ class ValueOutOfBounds(IllegalValue):
         ufixed8x1_encoder(Decimal('25.6'))  # out of bounds
 
     """
-    ...
 
+    ...
 
 class DecodingError(Exception):
     """
     Base exception for any error that occurs during decoding.
     """
-    ...
 
+    ...
 
 class InsufficientDataBytes(DecodingError):
     """
     Raised when there are insufficient data to decode a value for a given ABI
     type.
     """
-    ...
 
+    ...
 
 class NonEmptyPaddingBytes(DecodingError):
     """
     Raised when the padding bytes of an ABI value are malformed.
     """
-    ...
 
+    ...
 
 class ParseError(ParseError):
     """
     Raised when an ABI type string cannot be parsed.
     """
-    def __str__(self) -> str:
-        ...
-    
-
+    def __str__(self) -> str: ...
 
 class ABITypeError(ValueError):
     """
@@ -87,15 +84,15 @@ class ABITypeError(ValueError):
     when trying to parse the type string ``'uint7'`` (which has a bit-width
     that is not congruent with zero modulo eight).
     """
-    ...
 
+    ...
 
 class PredicateMappingError(Exception):
     """
     Raised when an error occurs in a registry's internal mapping.
     """
-    ...
 
+    ...
 
 class NoEntriesFound(ValueError, PredicateMappingError):
     """
@@ -107,8 +104,8 @@ class NoEntriesFound(ValueError, PredicateMappingError):
         In a future version of ``eth-abi``, this error class will no longer
         inherit from ``ValueError``.
     """
-    ...
 
+    ...
 
 class MultipleEntriesFound(ValueError, PredicateMappingError):
     """
@@ -122,6 +119,5 @@ class MultipleEntriesFound(ValueError, PredicateMappingError):
         In a future version of ``eth-abi``, this error class will no longer
         inherit from ``ValueError``.
     """
+
     ...
-
-

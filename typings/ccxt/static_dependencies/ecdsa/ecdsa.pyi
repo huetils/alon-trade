@@ -54,83 +54,71 @@ Revision history:
 
 Written in 2005 by Peter Pearson and placed in the public domain.
 """
-class RSZeroError(RuntimeError):
-    ...
 
+class RSZeroError(RuntimeError): ...
 
 class Signature:
-    """ECDSA signature.
-  """
-    def __init__(self, r, s, recovery_param) -> None:
-        ...
-    
-    def recover_public_keys(self, hash, generator): # -> list[Public_key]:
+    """ECDSA signature."""
+    def __init__(self, r, s, recovery_param) -> None: ...
+    def recover_public_keys(self, hash, generator):  # -> list[Public_key]:
         """Returns two public keys for which the signature is valid
-    hash is signed hash
-    generator is the used generator of the signature
-    """
+        hash is signed hash
+        generator is the used generator of the signature
+        """
         ...
-    
-
 
 class Public_key:
-    """Public key for ECDSA.
-  """
+    """Public key for ECDSA."""
     def __init__(self, generator, point) -> None:
         """generator is the Point that generates the group,
-    point is the Point that defines the public key.
-    """
+        point is the Point that defines the public key.
+        """
         ...
-    
-    def verifies(self, hash, signature): # -> Literal[False]:
-        """Verify that signature is a valid signature of hash.
-    Return True if the signature is valid.
-    """
-        ...
-    
 
+    def verifies(self, hash, signature):  # -> Literal[False]:
+        """Verify that signature is a valid signature of hash.
+        Return True if the signature is valid.
+        """
+        ...
 
 class Private_key:
-    """Private key for ECDSA.
-  """
+    """Private key for ECDSA."""
     def __init__(self, public_key, secret_multiplier) -> None:
         """public_key is of class Public_key;
-    secret_multiplier is a large integer.
-    """
+        secret_multiplier is a large integer.
+        """
         ...
-    
-    def sign(self, hash, random_k): # -> Signature:
+
+    def sign(self, hash, random_k):  # -> Signature:
         """Return a signature for the provided hash, using the provided
-    random nonce.  It is absolutely vital that random_k be an unpredictable
-    number in the range [1, self.public_key.point.order()-1].  If
-    an attacker can guess random_k, he can compute our private key from a
-    single signature.  Also, if an attacker knows a few high-order
-    bits (or a few low-order bits) of random_k, he can compute our private
-    key from many signatures.  The generation of nonces with adequate
-    cryptographic strength is very difficult and far beyond the scope
-    of this comment.
+        random nonce.  It is absolutely vital that random_k be an unpredictable
+        number in the range [1, self.public_key.point.order()-1].  If
+        an attacker can guess random_k, he can compute our private key from a
+        single signature.  Also, if an attacker knows a few high-order
+        bits (or a few low-order bits) of random_k, he can compute our private
+        key from many signatures.  The generation of nonces with adequate
+        cryptographic strength is very difficult and far beyond the scope
+        of this comment.
 
-    May raise RuntimeError, in which case retrying with a new
-    random value k is in order.
-    """
+        May raise RuntimeError, in which case retrying with a new
+        random value k is in order.
+        """
         ...
-    
 
-
-def int_to_string(x): # -> bytes:
+def int_to_string(x):  # -> bytes:
     """Convert integer x into a string of bytes, as per X9.62."""
     ...
 
-def string_to_int(s): # -> int:
+def string_to_int(s):  # -> int:
     """Convert a string of bytes into an integer, as per X9.62."""
     ...
 
-def digest_integer(m): # -> int:
+def digest_integer(m):  # -> int:
     """Convert an integer into a string of bytes, compute
-     its SHA-1 hash, and convert the result to an integer."""
+    its SHA-1 hash, and convert the result to an integer."""
     ...
 
-def point_is_valid(generator, x, y): # -> bool:
+def point_is_valid(generator, x, y):  # -> bool:
     """Is (x,y) a valid public key based on the specified generator?"""
     ...
 

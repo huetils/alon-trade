@@ -20,13 +20,18 @@ class SignableMessage(NamedTuple):
 
     .. _EIP-191: https://eips.ethereum.org/EIPS/eip-191
     """
+
     version: bytes
     header: bytes
     body: bytes
     ...
 
-
-def encode_typed_data(domain_data: Dict[str, Any] = ..., message_types: Dict[str, Any] = ..., message_data: Dict[str, Any] = ..., full_message: Dict[str, Any] = ...) -> SignableMessage:
+def encode_typed_data(
+    domain_data: Dict[str, Any] = ...,
+    message_types: Dict[str, Any] = ...,
+    message_data: Dict[str, Any] = ...,
+    full_message: Dict[str, Any] = ...,
+) -> SignableMessage:
     r"""
     Encode an EIP-712_ message in a manner compatible with other implementations
     in use, such as the Metamask and Ethers ``signTypedData`` functions.
@@ -180,4 +185,3 @@ def encode_typed_data(domain_data: Dict[str, Any] = ..., message_types: Dict[str
     .. _EIP-712: https://eips.ethereum.org/EIPS/eip-712
     """
     ...
-

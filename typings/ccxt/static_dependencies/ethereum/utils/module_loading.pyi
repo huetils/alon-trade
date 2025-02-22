@@ -15,4 +15,3 @@ def import_string(dotted_path: str) -> Any:
     Source: django.utils.module_loading
     """
     ...
-

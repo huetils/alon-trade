@@ -17,19 +17,21 @@ Everything in this module should be regarded as implementation details.
 Users should try to not use this module directly.
 """
 module_info = ...
-def num_pos_args(sigspec): # -> int:
-    """ Return the number of positional arguments.  ``f(x, y=1)`` has 1"""
+
+def num_pos_args(sigspec):  # -> int:
+    """Return the number of positional arguments.  ``f(x, y=1)`` has 1"""
     ...
 
-def get_exclude_keywords(num_pos_only, sigspec): # -> tuple[()] | tuple[Any, ...]:
-    """ Return the names of position-only arguments if func has **kwargs"""
+def get_exclude_keywords(num_pos_only, sigspec):  # -> tuple[()] | tuple[Any, ...]:
+    """Return the names of position-only arguments if func has **kwargs"""
     ...
 
-def signature_or_spec(func): # -> Signature | None:
+def signature_or_spec(func):  # -> Signature | None:
     ...
-
-def expand_sig(sig): # -> tuple[Any | int, Any, Any | tuple[()] | tuple[str, ...], Signature | None]:
-    """ Convert the signature spec in ``module_info`` to add to ``signatures``
+def expand_sig(
+    sig,
+):  # -> tuple[Any | int, Any, Any | tuple[()] | tuple[str, ...], Signature | None]:
+    """Convert the signature spec in ``module_info`` to add to ``signatures``
 
     The input signature spec is one of:
         - ``lambda_func``
@@ -48,26 +50,22 @@ def expand_sig(sig): # -> tuple[Any | int, Any, Any | tuple[()] | tuple[str, ...
     ...
 
 signatures = ...
-def create_signature_registry(module_info=..., signatures=...): # -> None:
+
+def create_signature_registry(module_info=..., signatures=...):  # -> None:
+    ...
+def check_valid(sig, args, kwargs):  # -> bool:
+    """Like ``is_valid_args`` for the given signature spec"""
     ...
 
-def check_valid(sig, args, kwargs): # -> bool:
-    """ Like ``is_valid_args`` for the given signature spec"""
+def check_partial(sig, args, kwargs):  # -> bool:
+    """Like ``is_partial_args`` for the given signature spec"""
     ...
 
-def check_partial(sig, args, kwargs): # -> bool:
-    """ Like ``is_partial_args`` for the given signature spec"""
+def check_arity(n, sig):  # -> bool | None:
     ...
-
-def check_arity(n, sig): # -> bool | None:
+def check_varargs(sig):  # -> bool | None:
     ...
-
-def check_varargs(sig): # -> bool | None:
+def check_keywords(sig):  # -> bool | None:
     ...
-
-def check_keywords(sig): # -> bool | None:
+def check_required_args(sig):  # -> int:
     ...
-
-def check_required_args(sig): # -> int:
-    ...
-

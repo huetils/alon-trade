@@ -1,16 +1,16 @@
 import sqlite3
 import time
-from typing import List, Tuple
+from typing import Tuple
 
 DB_NAME: str = "orderbook_data.db"
 
 
-def fetch_latest_rows(table_name: str, limit: int = 10) -> List[Tuple[str]]:
+def fetch_latest_rows(table_name: str, limit: int = 10) -> list[Tuple[str]]:
     """
     Fetch the latest rows from the specified table.
     :param table_name: The table to query.
     :param limit: Number of rows to fetch.
-    :return: List of rows.
+    :return: list of rows.
     """
     conn: sqlite3.Connection = sqlite3.connect(DB_NAME)
     cursor: sqlite3.Cursor = conn.cursor()
@@ -24,21 +24,21 @@ def fetch_latest_rows(table_name: str, limit: int = 10) -> List[Tuple[str]]:
         (limit,),
     )
 
-    rows: List[Tuple[str]] = cursor.fetchall()
+    rows: list[Tuple[str]] = cursor.fetchall()
     conn.close()
     return rows
 
 
-def list_tables() -> List[str]:
+def list_tables() -> list[str]:
     """
-    List all tables in the database.
-    :return: List of table names.
+    list all tables in the database.
+    :return: list of table names.
     """
     conn: sqlite3.Connection = sqlite3.connect(DB_NAME)
     cursor: sqlite3.Cursor = conn.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tables: List[Tuple[str]] = cursor.fetchall()
+    tables: list[Tuple[str]] = cursor.fetchall()
     conn.close()
 
     return [table[0] for table in tables]

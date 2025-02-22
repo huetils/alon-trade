@@ -7,13 +7,53 @@ import decimal
 import ipaddress
 import typing
 from enum import Enum as EnumType
+
 from . import types
 from .base import FieldABC, SchemaABC
 from .exceptions import ValidationError
 
 """Field classes for various types of data."""
-__all__ = ["Field", "Raw", "Nested", "Mapping", "Dict", "List", "Tuple", "String", "UUID", "Number", "Integer", "Decimal", "Boolean", "Float", "DateTime", "NaiveDateTime", "AwareDateTime", "Time", "Date", "TimeDelta", "Url", "URL", "Email", "IP", "IPv4", "IPv6", "IPInterface", "IPv4Interface", "IPv6Interface", "Enum", "Method", "Function", "Str", "Bool", "Int", "Constant", "Pluck"]
+__all__ = [
+    "Field",
+    "Raw",
+    "Nested",
+    "Mapping",
+    "Dict",
+    "List",
+    "Tuple",
+    "String",
+    "UUID",
+    "Number",
+    "Integer",
+    "Decimal",
+    "Boolean",
+    "Float",
+    "DateTime",
+    "NaiveDateTime",
+    "AwareDateTime",
+    "Time",
+    "Date",
+    "TimeDelta",
+    "Url",
+    "URL",
+    "Email",
+    "IP",
+    "IPv4",
+    "IPv6",
+    "IPInterface",
+    "IPv4Interface",
+    "IPv6Interface",
+    "Enum",
+    "Method",
+    "Function",
+    "Str",
+    "Bool",
+    "Int",
+    "Constant",
+    "Pluck",
+]
 _T = typing.TypeVar("_T")
+
 class Field(FieldABC):
     """Basic field from which other fields should extend. It applies no
     formatting by default, and should only be used in cases where
@@ -75,18 +115,35 @@ class Field(FieldABC):
         Add ``data_key`` parameter for the specifying the key in the input and
         output data. This parameter replaced both ``load_from`` and ``dump_to``.
     """
+
     _CHECK_ATTRIBUTE = ...
     default_error_messages = ...
-    def __init__(self, *, load_default: typing.Any = ..., missing: typing.Any = ..., dump_default: typing.Any = ..., default: typing.Any = ..., data_key: str | None = ..., attribute: str | None = ..., validate: (None | typing.Callable[[typing.Any], typing.Any] | typing.Iterable[typing.Callable[[typing.Any], typing.Any]]) = ..., required: bool = ..., allow_none: bool | None = ..., load_only: bool = ..., dump_only: bool = ..., error_messages: dict[str, str] | None = ..., metadata: typing.Mapping[str, typing.Any] | None = ..., **additional_metadata) -> None:
+    def __init__(
+        self,
+        *,
+        load_default: typing.Any = ...,
+        missing: typing.Any = ...,
+        dump_default: typing.Any = ...,
+        default: typing.Any = ...,
+        data_key: str | None = ...,
+        attribute: str | None = ...,
+        validate: (
+            None
+            | typing.Callable[[typing.Any], typing.Any]
+            | typing.Iterable[typing.Callable[[typing.Any], typing.Any]]
+        ) = ...,
+        required: bool = ...,
+        allow_none: bool | None = ...,
+        load_only: bool = ...,
+        dump_only: bool = ...,
+        error_messages: dict[str, str] | None = ...,
+        metadata: typing.Mapping[str, typing.Any] | None = ...,
+        **additional_metadata,
+    ) -> None: ...
+    def __repr__(self) -> str: ...
+    def __deepcopy__(self, memo):  # -> Self:
         ...
-    
-    def __repr__(self) -> str:
-        ...
-    
-    def __deepcopy__(self, memo): # -> Self:
-        ...
-    
-    def get_value(self, obj, attr, accessor=..., default=...): # -> Any:
+    def get_value(self, obj, attr, accessor=..., default=...):  # -> Any:
         """Return the value for a given key from an object.
 
         :param object obj: The object to get the value from.
@@ -95,13 +152,13 @@ class Field(FieldABC):
             the object `obj`. Defaults to `marshmallow.utils.get_value`.
         """
         ...
-    
+
     def make_error(self, key: str, **kwargs) -> ValidationError:
         """Helper method to make a `ValidationError` with an error message
         from ``self.error_messages``.
         """
         ...
-    
+
     def fail(self, key: str, **kwargs):
         """Helper method that raises a `ValidationError` with an error message
         from ``self.error_messages``.
@@ -110,8 +167,15 @@ class Field(FieldABC):
             Use `make_error <marshmallow.fields.Field.make_error>` instead.
         """
         ...
-    
-    def serialize(self, attr: str, obj: typing.Any, accessor: typing.Callable[[typing.Any, str, typing.Any], typing.Any] | None = ..., **kwargs): # -> object | Any:
+
+    def serialize(
+        self,
+        attr: str,
+        obj: typing.Any,
+        accessor: typing.Callable[[typing.Any, str, typing.Any], typing.Any]
+        | None = ...,
+        **kwargs,
+    ):  # -> object | Any:
         """Pulls the value for the given key from the object, applies the
         field's formatting and returns the result.
 
@@ -121,8 +185,14 @@ class Field(FieldABC):
         :param kwargs: Field-specific keyword arguments.
         """
         ...
-    
-    def deserialize(self, value: typing.Any, attr: str | None = ..., data: typing.Mapping[str, typing.Any] | None = ..., **kwargs): # -> object | Any | None:
+
+    def deserialize(
+        self,
+        value: typing.Any,
+        attr: str | None = ...,
+        data: typing.Mapping[str, typing.Any] | None = ...,
+        **kwargs,
+    ):  # -> object | Any | None:
         """Deserialize ``value``.
 
         :param value: The value to deserialize.
@@ -133,34 +203,29 @@ class Field(FieldABC):
             is missing.
         """
         ...
-    
+
     @property
     def context(self):
         """The context dictionary for the parent :class:`Schema`."""
         ...
-    
-    @property
-    def default(self): # -> Any:
-        ...
-    
-    @default.setter
-    def default(self, value): # -> None:
-        ...
-    
-    @property
-    def missing(self): # -> Any:
-        ...
-    
-    @missing.setter
-    def missing(self, value): # -> None:
-        ...
-    
 
+    @property
+    def default(self):  # -> Any:
+        ...
+    @default.setter
+    def default(self, value):  # -> None:
+        ...
+    @property
+    def missing(self):  # -> Any:
+        ...
+    @missing.setter
+    def missing(self, value):  # -> None:
+        ...
 
 class Raw(Field):
     """Field that applies no formatting."""
-    ...
 
+    ...
 
 class Nested(Field):
     """Allows you to nest a :class:`Schema <marshmallow.Schema>`
@@ -207,20 +272,32 @@ class Nested(Field):
         fields in the data. Use `EXCLUDE`, `INCLUDE` or `RAISE`.
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
+
     default_error_messages = ...
-    def __init__(self, nested: SchemaABC | type | str | dict[str, Field | type] | typing.Callable[[], SchemaABC | type | dict[str, Field | type]], *, dump_default: typing.Any = ..., default: typing.Any = ..., only: types.StrSequenceOrSet | None = ..., exclude: types.StrSequenceOrSet = ..., many: bool = ..., unknown: str | None = ..., **kwargs) -> None:
-        ...
-    
+    def __init__(
+        self,
+        nested: SchemaABC
+        | type
+        | str
+        | dict[str, Field | type]
+        | typing.Callable[[], SchemaABC | type | dict[str, Field | type]],
+        *,
+        dump_default: typing.Any = ...,
+        default: typing.Any = ...,
+        only: types.StrSequenceOrSet | None = ...,
+        exclude: types.StrSequenceOrSet = ...,
+        many: bool = ...,
+        unknown: str | None = ...,
+        **kwargs,
+    ) -> None: ...
     @property
-    def schema(self): # -> SchemaABC | Schema | None:
+    def schema(self):  # -> SchemaABC | Schema | None:
         """The nested Schema object.
 
         .. versionchanged:: 1.0.0
             Renamed from `serializer` to `schema`.
         """
         ...
-    
-
 
 class Pluck(Nested):
     """Allows you to replace nested data with one of the data's fields.
@@ -248,10 +325,12 @@ class Pluck(Nested):
     :param str field_name: The key to pluck a value from.
     :param kwargs: The same keyword arguments that :class:`Nested` receives.
     """
-    def __init__(self, nested: SchemaABC | type | str | typing.Callable[[], SchemaABC], field_name: str, **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self,
+        nested: SchemaABC | type | str | typing.Callable[[], SchemaABC],
+        field_name: str,
+        **kwargs,
+    ) -> None: ...
 
 class List(Field):
     """A list field, composed with another `Field` class or
@@ -271,11 +350,9 @@ class List(Field):
     .. versionchanged:: 3.0.0rc9
         Does not serialize scalar values to single-item lists.
     """
-    default_error_messages = ...
-    def __init__(self, cls_or_instance: Field | type, **kwargs) -> None:
-        ...
-    
 
+    default_error_messages = ...
+    def __init__(self, cls_or_instance: Field | type, **kwargs) -> None: ...
 
 class Tuple(Field):
     """A tuple field, composed of a fixed number of other `Field` classes or
@@ -296,24 +373,22 @@ class Tuple(Field):
 
     .. versionadded:: 3.0.0rc4
     """
-    default_error_messages = ...
-    def __init__(self, tuple_fields, *args, **kwargs) -> None:
-        ...
-    
 
+    default_error_messages = ...
+    def __init__(self, tuple_fields, *args, **kwargs) -> None: ...
 
 class String(Field):
     """A string field.
 
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
-    default_error_messages = ...
 
+    default_error_messages = ...
 
 class UUID(String):
     """A UUID field."""
-    default_error_messages = ...
 
+    default_error_messages = ...
 
 class Number(Field):
     """Base class for number fields.
@@ -321,12 +396,10 @@ class Number(Field):
     :param bool as_string: If `True`, format the serialized value as a string.
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
+
     num_type: typing.Type = ...
     default_error_messages = ...
-    def __init__(self, *, as_string: bool = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, *, as_string: bool = ..., **kwargs) -> None: ...
 
 class Integer(Number):
     """An integer field.
@@ -335,12 +408,10 @@ class Integer(Number):
         Otherwise, any value castable to `int` is valid.
     :param kwargs: The same keyword arguments that :class:`Number` receives.
     """
+
     num_type = int
     default_error_messages = ...
-    def __init__(self, *, strict: bool = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, *, strict: bool = ..., **kwargs) -> None: ...
 
 class Float(Number):
     """A double as an IEEE-754 double precision string.
@@ -350,12 +421,12 @@ class Float(Number):
     :param bool as_string: If `True`, format the value as a string.
     :param kwargs: The same keyword arguments that :class:`Number` receives.
     """
+
     num_type = float
     default_error_messages = ...
-    def __init__(self, *, allow_nan: bool = ..., as_string: bool = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self, *, allow_nan: bool = ..., as_string: bool = ..., **kwargs
+    ) -> None: ...
 
 class Decimal(Number):
     """A field that (de)serializes to the Python ``decimal.Decimal`` type.
@@ -393,12 +464,18 @@ class Decimal(Number):
 
     .. versionadded:: 1.2.0
     """
+
     num_type = decimal.Decimal
     default_error_messages = ...
-    def __init__(self, places: int | None = ..., rounding: str | None = ..., *, allow_nan: bool = ..., as_string: bool = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self,
+        places: int | None = ...,
+        rounding: str | None = ...,
+        *,
+        allow_nan: bool = ...,
+        as_string: bool = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Boolean(Field):
     """A boolean field.
@@ -410,13 +487,13 @@ class Boolean(Field):
         `marshmallow.fields.Boolean.falsy` will be used.
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
+
     truthy = ...
     falsy = ...
     default_error_messages = ...
-    def __init__(self, *, truthy: set | None = ..., falsy: set | None = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self, *, truthy: set | None = ..., falsy: set | None = ..., **kwargs
+    ) -> None: ...
 
 class DateTime(Field):
     """A formatted datetime string.
@@ -433,16 +510,16 @@ class DateTime(Field):
     .. versionchanged:: 3.19
         Add timestamp as a format.
     """
-    SERIALIZATION_FUNCS: typing.Dict[str, typing.Callable[[typing.Any], str | float]] = ...
+
+    SERIALIZATION_FUNCS: typing.Dict[
+        str, typing.Callable[[typing.Any], str | float]
+    ] = ...
     DESERIALIZATION_FUNCS: typing.Dict[str, typing.Callable[[str], typing.Any]] = ...
     DEFAULT_FORMAT = ...
     OBJ_TYPE = ...
     SCHEMA_OPTS_VAR_NAME = ...
     default_error_messages = ...
-    def __init__(self, format: str | None = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, format: str | None = ..., **kwargs) -> None: ...
 
 class NaiveDateTime(DateTime):
     """A formatted naive datetime string.
@@ -456,11 +533,11 @@ class NaiveDateTime(DateTime):
 
     .. versionadded:: 3.0.0rc9
     """
-    AWARENESS = ...
-    def __init__(self, format: str | None = ..., *, timezone: dt.timezone | None = ..., **kwargs) -> None:
-        ...
-    
 
+    AWARENESS = ...
+    def __init__(
+        self, format: str | None = ..., *, timezone: dt.timezone | None = ..., **kwargs
+    ) -> None: ...
 
 class AwareDateTime(DateTime):
     """A formatted aware datetime string.
@@ -473,11 +550,15 @@ class AwareDateTime(DateTime):
 
     .. versionadded:: 3.0.0rc9
     """
-    AWARENESS = ...
-    def __init__(self, format: str | None = ..., *, default_timezone: dt.tzinfo | None = ..., **kwargs) -> None:
-        ...
-    
 
+    AWARENESS = ...
+    def __init__(
+        self,
+        format: str | None = ...,
+        *,
+        default_timezone: dt.tzinfo | None = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Time(DateTime):
     """A formatted time string.
@@ -488,12 +569,12 @@ class Time(DateTime):
         If `None`, defaults to "iso".
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
+
     SERIALIZATION_FUNCS = ...
     DESERIALIZATION_FUNCS = ...
     DEFAULT_FORMAT = ...
     OBJ_TYPE = ...
     SCHEMA_OPTS_VAR_NAME = ...
-
 
 class Date(DateTime):
     """ISO8601-formatted date string.
@@ -502,13 +583,13 @@ class Date(DateTime):
         If `None`, defaults to "iso".
     :param kwargs: The same keyword arguments that :class:`Field` receives.
     """
+
     default_error_messages = ...
     SERIALIZATION_FUNCS = ...
     DESERIALIZATION_FUNCS = ...
     DEFAULT_FORMAT = ...
     OBJ_TYPE = ...
     SCHEMA_OPTS_VAR_NAME = ...
-
 
 class TimeDelta(Field):
     """A field that (de)serializes a :class:`datetime.timedelta` object to an
@@ -542,6 +623,7 @@ class TimeDelta(Field):
         Allow (de)serialization to `float` through use of a new `serialization_type` parameter.
         `int` is the default to retain previous behaviour.
     """
+
     DAYS = ...
     SECONDS = ...
     MICROSECONDS = ...
@@ -550,10 +632,12 @@ class TimeDelta(Field):
     HOURS = ...
     WEEKS = ...
     default_error_messages = ...
-    def __init__(self, precision: str = ..., serialization_type: type[int | float] = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self,
+        precision: str = ...,
+        serialization_type: type[int | float] = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Mapping(Field):
     """An abstract class for objects with key-value pairs.
@@ -568,12 +652,15 @@ class Mapping(Field):
 
     .. versionadded:: 3.0.0rc4
     """
+
     mapping_type = dict
     default_error_messages = ...
-    def __init__(self, keys: Field | type | None = ..., values: Field | type | None = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(
+        self,
+        keys: Field | type | None = ...,
+        values: Field | type | None = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Dict(Mapping):
     """A dict field. Supports dicts and dict-like objects. Extends
@@ -587,8 +674,8 @@ class Dict(Mapping):
 
     .. versionadded:: 2.1.0
     """
-    mapping_type = dict
 
+    mapping_type = dict
 
 class Url(String):
     """An URL field.
@@ -600,11 +687,17 @@ class Url(String):
         ``ftp``, and ``ftps`` are allowed.
     :param kwargs: The same keyword arguments that :class:`String` receives.
     """
-    default_error_messages = ...
-    def __init__(self, *, relative: bool = ..., absolute: bool = ..., schemes: types.StrSequenceOrSet | None = ..., require_tld: bool = ..., **kwargs) -> None:
-        ...
-    
 
+    default_error_messages = ...
+    def __init__(
+        self,
+        *,
+        relative: bool = ...,
+        absolute: bool = ...,
+        schemes: types.StrSequenceOrSet | None = ...,
+        require_tld: bool = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Email(String):
     """An email field.
@@ -612,11 +705,9 @@ class Email(String):
     :param args: The same positional arguments that :class:`String` receives.
     :param kwargs: The same keyword arguments that :class:`String` receives.
     """
-    default_error_messages = ...
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-    
 
+    default_error_messages = ...
+    def __init__(self, *args, **kwargs) -> None: ...
 
 class IP(Field):
     """A IP address field.
@@ -626,30 +717,28 @@ class IP(Field):
 
     .. versionadded:: 3.8.0
     """
+
     default_error_messages = ...
     DESERIALIZATION_CLASS: typing.Optional[typing.Type] = ...
-    def __init__(self, *args, exploded=..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, *args, exploded=..., **kwargs) -> None: ...
 
 class IPv4(IP):
     """A IPv4 address field.
 
     .. versionadded:: 3.8.0
     """
+
     default_error_messages = ...
     DESERIALIZATION_CLASS = ipaddress.IPv4Address
-
 
 class IPv6(IP):
     """A IPv6 address field.
 
     .. versionadded:: 3.8.0
     """
+
     default_error_messages = ...
     DESERIALIZATION_CLASS = ipaddress.IPv6Address
-
 
 class IPInterface(Field):
     """A IPInterface field.
@@ -664,24 +753,22 @@ class IPInterface(Field):
     :param bool exploded: If `True`, serialize ipv6 interface in long form, ie. with groups
         consisting entirely of zeros included.
     """
+
     default_error_messages = ...
     DESERIALIZATION_CLASS: typing.Optional[typing.Type] = ...
-    def __init__(self, *args, exploded: bool = ..., **kwargs) -> None:
-        ...
-    
-
+    def __init__(self, *args, exploded: bool = ..., **kwargs) -> None: ...
 
 class IPv4Interface(IPInterface):
     """A IPv4 Network Interface field."""
+
     default_error_messages = ...
     DESERIALIZATION_CLASS = ipaddress.IPv4Interface
 
-
 class IPv6Interface(IPInterface):
     """A IPv6 Network Interface field."""
+
     default_error_messages = ...
     DESERIALIZATION_CLASS = ipaddress.IPv6Interface
-
 
 class Enum(Field):
     """An Enum field (de)serializing enum members by symbol (name) or by value.
@@ -696,11 +783,11 @@ class Enum(Field):
 
     .. versionadded:: 3.18.0
     """
-    default_error_messages = ...
-    def __init__(self, enum: type[EnumType], *, by_value: bool | Field | type = ..., **kwargs) -> None:
-        ...
-    
 
+    default_error_messages = ...
+    def __init__(
+        self, enum: type[EnumType], *, by_value: bool | Field | type = ..., **kwargs
+    ) -> None: ...
 
 class Method(Field):
     """A field that takes the value returned by a `Schema` method.
@@ -722,11 +809,11 @@ class Method(Field):
     .. versionchanged:: 3.0.0
         Removed ``method_name`` parameter.
     """
-    _CHECK_ATTRIBUTE = ...
-    def __init__(self, serialize: str | None = ..., deserialize: str | None = ..., **kwargs) -> None:
-        ...
-    
 
+    _CHECK_ATTRIBUTE = ...
+    def __init__(
+        self, serialize: str | None = ..., deserialize: str | None = ..., **kwargs
+    ) -> None: ...
 
 class Function(Field):
     """A field that takes the value returned by a function.
@@ -750,11 +837,22 @@ class Function(Field):
     .. versionchanged:: 3.0.0a1
         Removed ``func`` parameter.
     """
-    _CHECK_ATTRIBUTE = ...
-    def __init__(self, serialize: (None | typing.Callable[[typing.Any], typing.Any] | typing.Callable[[typing.Any, dict], typing.Any]) = ..., deserialize: (None | typing.Callable[[typing.Any], typing.Any] | typing.Callable[[typing.Any, dict], typing.Any]) = ..., **kwargs) -> None:
-        ...
-    
 
+    _CHECK_ATTRIBUTE = ...
+    def __init__(
+        self,
+        serialize: (
+            None
+            | typing.Callable[[typing.Any], typing.Any]
+            | typing.Callable[[typing.Any, dict], typing.Any]
+        ) = ...,
+        deserialize: (
+            None
+            | typing.Callable[[typing.Any], typing.Any]
+            | typing.Callable[[typing.Any, dict], typing.Any]
+        ) = ...,
+        **kwargs,
+    ) -> None: ...
 
 class Constant(Field):
     """A field that (de)serializes to a preset constant.  If you only want the
@@ -765,11 +863,9 @@ class Constant(Field):
 
     .. versionadded:: 2.0.0
     """
-    _CHECK_ATTRIBUTE = ...
-    def __init__(self, constant: typing.Any, **kwargs) -> None:
-        ...
-    
 
+    _CHECK_ATTRIBUTE = ...
+    def __init__(self, constant: typing.Any, **kwargs) -> None: ...
 
 class Inferred(Field):
     """A field that infers how to serialize, based on the value type.
@@ -779,10 +875,7 @@ class Inferred(Field):
         This class is treated as private API.
         Users should not need to use this class directly.
     """
-    def __init__(self) -> None:
-        ...
-    
-
+    def __init__(self) -> None: ...
 
 URL = Url
 Str = String

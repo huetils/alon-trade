@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
-from typing import Any, Dict, List
+from typing import Any, dict, list
 
 import ccxt.pro
 
@@ -33,14 +33,14 @@ logger = setup_logger()
 
 
 async def stream_ohlcv(
-    exchange_id: str, symbols: List[str], timeframe: str = "1m"
+    exchange_id: str, symbols: list[str], timeframe: str = "1m"
 ) -> None:
     """
     Stream OHLCV data for the specified exchange and symbols.
 
     Args:
         exchange_id (str): ID of the exchange (e.g., 'okx', 'binance').
-        symbols (List[str]): List of trading pairs (e.g., ['BTC/USDT', 'ETH/USDT']).
+        symbols (list[str]): list of trading pairs (e.g., ['BTC/USDT', 'ETH/USDT']).
         timeframe (str, optional): Timeframe for OHLCV data (default is '1m').
 
     Returns:
@@ -74,7 +74,7 @@ async def main() -> None:
     """
 
     # Define exchanges and their symbols
-    exchanges: List[Dict[str, Any]] = [
+    exchanges: list[dict[str, Any]] = [
         {"id": "okx", "symbols": ["BTC/USDT", "ETH/USDT"]},
         # {"id": "binance", "symbols": ["BTC/USDT", "ETH/USDT"]},
         # {"id": "kraken", "symbols": ["BTC/USD", "ETH/USD"]},

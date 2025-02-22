@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import ccxt
 import ccxt.async_support
@@ -20,10 +20,10 @@ API_SECRET = os.getenv("OKX_API_SECRET", "")
 API_PASSWORD = os.getenv("OKX_API_PASSWORD", "")
 
 # We'll store open positions here (one position per symbol)
-open_positions: Dict[str, Dict[str, Any]] = {}
+open_positions: dict[str, dict[str, Any]] = {}
 
 # We’ll also store the *latest* funding rate info for each symbol
-latest_funding_rates: Dict[str, Dict[str, Any]] = {}
+latest_funding_rates: dict[str, dict[str, Any]] = {}
 
 # Default config file name
 DEFAULT_CONFIG_FILE = "config.yaml"
@@ -70,7 +70,7 @@ logger = setup_logger()
 config = load_config()
 
 # Override with config/env if available
-defaults: Dict[str, Any] = {
+defaults: dict[str, Any] = {
     "ORDER_FILL_TIMEOUT_SEC": 5,
     "MAX_RETRIES": 2,
     "SLIPPAGE_FACTOR": 0.0002,
@@ -169,7 +169,7 @@ async def funding_rate_collector(exchange: ccxt.async_support.okx.okx, market: s
     while True:
         try:
             fr_info = cast(
-                "Dict[str, Any]",
+                "dict[str, Any]",
                 await exchange.watch_funding_rate(market),  # type: ignore
             )
 
@@ -326,7 +326,7 @@ async def try_open_position(
         free_balance = await robust_fetch_balance(exchange, configurations["CURRENCY"])
         if free_balance <= 0:
             logger.warning(
-                f"[try_open_position] No free {configurations["CURRENCY"]} to open {symbol}."
+                f"[try_open_position] No free {configurations['CURRENCY']} to open {symbol}."
             )
             return
 
@@ -343,7 +343,7 @@ async def try_open_position(
         try:
             await exchange.set_leverage(configurations["LEVERAGE_LIMIT"], symbol)
             logger.info(
-                f"[try_open_position] Set leverage={configurations["LEVERAGE_LIMIT"]} for {symbol}"
+                f"[try_open_position] Set leverage={configurations['LEVERAGE_LIMIT']} for {symbol}"
             )
         except Exception as e:
             logger.exception(f"Failed to set leverage for {symbol}: {e}")
@@ -392,7 +392,7 @@ async def try_open_position(
             if elapsed > configurations["ORDER_FILL_TIMEOUT_SEC"]:
                 retries += 1
                 logger.info(
-                    f"[ORDER TIMEOUT] {symbol}, {order_id} not filled in {configurations["ORDER_FILL_TIMEOUT_SEC"]}s. "
+                    f"[ORDER TIMEOUT] {symbol}, {order_id} not filled in {configurations['ORDER_FILL_TIMEOUT_SEC']}s. "
                     f"filled={filled}, remaining={remaining}, retry={retries}"
                 )
                 # Cancel + reprice or fallback
@@ -493,7 +493,7 @@ async def robust_fetch_balance(exchange: Any, currency: str) -> float:
             await asyncio.sleep(2 * attempts)  # exponential-ish backoff
 
     logger.error(
-        f"[robust_fetch_balance] Exceeded {configurations["FETCH_BALANCE_MAX_RETRIES"]} attempts for {currency}. Returning 0."
+        f"[robust_fetch_balance] Exceeded {configurations['FETCH_BALANCE_MAX_RETRIES']} attempts for {currency}. Returning 0."
     )
     return 0.0
 
