@@ -2,10 +2,9 @@ import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
+from alon_client.arbitrage.x_ex_fr.config import configurations
+from alon_client.arbitrage.x_ex_fr.logger import logger
 from ccxt.base.exchange import Exchange
-
-from alon_client.arbitrage.funding_rate.config import configurations
-from alon_client.arbitrage.funding_rate.logger import logger
 
 
 @dataclass
