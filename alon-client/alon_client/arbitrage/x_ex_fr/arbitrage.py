@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
+from alon_client.arbitrage.x_ex_fr.balancer import start_balance_manager
 from alon_client.arbitrage.x_ex_fr.config import configurations
 from alon_client.arbitrage.x_ex_fr.exchange import initialize_exchange
 from alon_client.arbitrage.x_ex_fr.logger import logger
@@ -146,6 +147,11 @@ async def funding_rate_arbitrage(exchanges_config: List[Dict[str, Any]]) -> None
 
         logger.info(f"Initialized {len(exchanges)} exchanges.")
 
+        # Start the balance manager alongside arbitrage monitoring
+        balance_manager_task = asyncio.create_task(
+            start_balance_manager(exchanges_config)
+        )
+
         # Collect funding rates for each exchange's swap markets
         collector_tasks: list[asyncio.Task[None]] = []
 
@@ -166,7 +172,7 @@ async def funding_rate_arbitrage(exchanges_config: List[Dict[str, Any]]) -> None
         # Run funding rate analyzer
         analyzer_task = asyncio.create_task(funding_rate_analyzer())
 
-        await asyncio.gather(*collector_tasks, analyzer_task)
+        await asyncio.gather(*collector_tasks, analyzer_task, balance_manager_task)
 
     except Exception as e:
         logger.exception("Critical error in funding_rate_arbitrage loop:", exc_info=e)
