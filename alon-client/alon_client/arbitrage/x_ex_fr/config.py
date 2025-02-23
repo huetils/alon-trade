@@ -30,18 +30,21 @@ defaults: dict[str, Any] = {
             "api_password": os.getenv("BYBIT_API_PASSWORD", ""),
         },
     ],
-    "ORDER_FILL_TIMEOUT_SEC": 5,
-    "MAX_RETRIES": 3,
-    "MIN_ARBITRAGE_THRESHOLD": 0.0005,
-    "MIN_ABS_FUNDING_RATE": 0.001,
-    "TRADE_AMOUNT_PERCENT": 1.0,
-    "LEVERAGE_LIMIT": 10,
-    "TOP_OPPORTUNITIES": 5,
-    "CURRENCY": "USDT",
-    "FUNDING_INTERVAL_HOURS": 8,
-    "CHECK_INTERVAL": 1,
-    "TIME_TO_FUNDING_THRESHOLD": 5,
-    "FETCH_BALANCE_MAX_RETRIES": 3,
+    "ORDER_FILL_TIMEOUT_SEC": 5,  # Maximum time (seconds) to wait for order fulfillment
+    "MAX_RETRIES": 3,  # Maximum number of retries for failed operations
+    "MIN_ARBITRAGE_THRESHOLD": 0.0005,  # Minimum funding rate difference required to open arbitrage positions
+    "MIN_ABS_FUNDING_RATE": 0.001,  # Minimum absolute funding rate to consider a trade
+    "TRADE_AMOUNT_PERCENT": 1.0,  # Percentage of balance allocated per trade
+    "LEVERAGE_LIMIT": 10,  # Maximum leverage allowed for trades
+    "TOP_OPPORTUNITIES": 5,  # Number of top arbitrage opportunities to consider
+    "CURRENCY": "USDT",  # Base currency for balance monitoring and transfers
+    "FUNDING_INTERVAL_HOURS": 8,  # Interval (hours) for funding rate updates
+    "CHECK_INTERVAL": 1,  # Interval (seconds) for monitoring funding rates
+    "TIME_TO_FUNDING_THRESHOLD": 5,  # Minimum hours before funding payout to consider a trade
+    "FETCH_BALANCE_MAX_RETRIES": 3,  # Maximum retries for fetching balances
+    "MIN_BALANCE_THRESHOLD": 50,  # Minimum required balance on an exchange before triggering a transfer
+    "TRANSFER_THRESHOLD": 500,  # Balance threshold above which funds are transferred to other exchanges
+    "BALANCE_CHECK_INTERVAL": 60,  # Time interval (seconds) for checking and rebalancing account balances
 }
 
 config = load_config()
