@@ -2,13 +2,14 @@ import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any, Dict, List, Tuple
+from typing import Any
+
+from ccxt.base.exchange import Exchange
 
 from alon_client.arbitrage.x_ex_fr.balancer import start_balance_manager
 from alon_client.arbitrage.x_ex_fr.config import configurations
 from alon_client.arbitrage.x_ex_fr.exchange import initialize_exchange
 from alon_client.arbitrage.x_ex_fr.logger import logger
-from ccxt.base.exchange import Exchange
 
 
 @dataclass
@@ -28,19 +29,28 @@ class Position:
 
 
 # Dictionary to store the latest funding rates from all exchanges
-latest_funding_rates: Dict[Tuple[str, str], FundingRate] = (
-    {}
-)  # {(exchange, symbol): FundingRate}
-open_positions: Dict[str, Position] = {}  # {symbol: Position}
+latest_funding_rates: dict[
+    tuple[str, str], FundingRate
+] = {}  # {(exchange, symbol): FundingRate}
+open_positions: dict[str, Position] = {}  # {symbol: Position}
 
 
 async def funding_rate_collector(exchange: Exchange, market: str) -> None:
-    """
-    Collects funding rates from a specific exchange and updates the latest_funding_rates dictionary.
+    """Collects funding rates from a specific exchange and updates the latest_funding_rates dictionary.
+
+    Args:
+        exchange (Exchange): The exchange to collect funding rates from.
+        market (str): The market to collect funding rates from.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If there is an error fetching the funding rate.
     """
     while True:
         try:
-            fr_info: Dict[str, Any] = dict(await exchange.fetch_funding_rate(market))  # type: ignore
+            fr_info: dict[str, Any] = dict(await exchange.fetch_funding_rate(market))  # type: ignore
             symbol = str(fr_info["symbol"])
             funding_rate = Decimal(str(fr_info["fundingRate"]))
 
@@ -59,7 +69,28 @@ async def funding_rate_collector(exchange: Exchange, market: str) -> None:
 
 async def funding_rate_analyzer() -> None:
     """
-    Identifies arbitrage opportunities by comparing funding rates across exchanges.
+    Asynchronously analyzes funding rates across different exchanges to identify and execute arbitrage opportunities.
+
+    This function continuously monitors funding rates for various symbols across multiple exchanges.
+    It identifies potential arbitrage opportunities based on the difference between the highest and lowest
+    funding rates exceeding a predefined threshold. It manages open positions, ensuring no duplicate trades
+    occur for the same symbol and closes positions if funding rates flip.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: Logs any unexpected errors encountered during the analysis.
+
+    Notes:
+        - Relies on global variables `latest_funding_rates`, `open_positions`, and `configurations`.
+        - `latest_funding_rates` should be a dictionary containing the latest funding rates for each symbol on each exchange.
+        - `open_positions` should be a dictionary to track currently open arbitrage positions.
+        - `configurations` should be a dictionary containing configuration parameters such as `MIN_ARBITRAGE_THRESHOLD` and `CHECK_INTERVAL`.
+        - The functions `close_position` and `try_open_position` are assumed to be defined elsewhere and handle the actual trade execution.
     """
     while True:
         try:
@@ -83,7 +114,6 @@ async def funding_rate_analyzer() -> None:
 
                 # Arbitrage condition: Funding rate difference must exceed the threshold
                 if (short_fr - long_fr) >= configurations["MIN_ARBITRAGE_THRESHOLD"]:
-
                     # Avoid duplicate trades for the same symbol
                     if symbol in open_positions:
                         current_pos = open_positions[symbol]
@@ -127,9 +157,40 @@ async def funding_rate_analyzer() -> None:
             logger.exception(f"[ANALYZER] Unexpected error: {e}")
 
 
-async def funding_rate_arbitrage(exchanges_config: List[Dict[str, Any]]) -> None:
+async def funding_rate_arbitrage(exchanges_config: list[dict[str, Any]]) -> None:
     """
-    Initializes multiple exchanges, starts funding rate collectors, and runs arbitrage strategy.
+    Asynchronously orchestrates funding rate arbitrage across multiple cryptocurrency exchanges.
+
+    This function initializes specified exchanges, starts a balance management task,
+    collects funding rates for relevant swap markets on each exchange,
+    analyzes these funding rates for arbitrage opportunities, and manages the
+    lifecycle of these tasks, including error handling and cleanup.
+
+    Args:
+        exchanges_config (list[dict[str, Any]]): A list of dictionaries, each containing
+            the configuration for a specific exchange. Each dictionary must have the
+            following keys:
+            - "id" (str): The exchange ID.
+            - "api_key" (str): The API key for the exchange.
+            - "api_secret" (str): The API secret for the exchange.
+            - "api_password" (str, optional): The API password for the exchange, if required.
+            Other keys may be present but are not required.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If a critical error occurs during the arbitrage process,
+            it logs the exception and proceeds to close all exchange sessions.
+
+    Notes:
+        - The function initializes exchanges using the `initialize_exchange` function.
+        - It starts a balance management task using `start_balance_manager`.
+        - It collects funding rates using `funding_rate_collector` for a subset of
+          swap markets on each exchange, determined by `configurations["TOP_OPPORTUNITIES"]`.
+        - It analyzes funding rates using `funding_rate_analyzer`.
+        - It ensures all exchange sessions are closed properly in the `finally` block,
+          regardless of errors.
     """
     exchanges: dict[str, Any] = {}
 

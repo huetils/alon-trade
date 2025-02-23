@@ -2,9 +2,10 @@ import asyncio
 from decimal import Decimal
 
 import ccxt.async_support as ccxt
+from ccxt.base.exchange import Exchange
+
 from alon_client.arbitrage.x_ex_fr.config import configurations
 from alon_client.arbitrage.x_ex_fr.logger import logger
-from ccxt.base.exchange import Exchange
 
 
 async def fetch_balance(exchange: Exchange, currency: str) -> Decimal:
@@ -47,8 +48,17 @@ async def transfer_funds(
 
 
 async def balance_monitor(exchanges: dict[str, Exchange]) -> None:
-    """
-    Monitor and balance funds across exchanges to prevent liquidation.
+    """Monitor and balance funds across exchanges to prevent liquidation.
+
+    Args:
+        exchanges (dict[str, Exchange]): A dictionary of exchanges, where the key is the exchange ID (str)
+            and the value is the Exchange object.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If an unexpected error occurs during the balancing process.
     """
     currency = configurations["CURRENCY"]
     min_balance = Decimal(configurations["MIN_BALANCE_THRESHOLD"])

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from typing import Dict, Tuple
+
 from ccxt.base.exchange import Exchange
 
 @dataclass
@@ -16,7 +17,6 @@ class FundingRate:
     timestamp: datetime
     ...
 
-
 @dataclass
 class Position:
     long_exchange: str
@@ -25,9 +25,9 @@ class Position:
     funding_time: datetime
     ...
 
-
 latest_funding_rates: Dict[Tuple[str, str], FundingRate] = ...
 open_positions: Dict[str, Position] = ...
+
 async def funding_rate_collector(exchange: Exchange, market: str) -> None:
     """
     Collects funding rates from a specific exchange and updates the latest_funding_rates dictionary.
@@ -39,4 +39,3 @@ async def funding_rate_analyzer() -> None:
     Analyzes funding rates across exchanges and executes arbitrage trades.
     """
     ...
-
