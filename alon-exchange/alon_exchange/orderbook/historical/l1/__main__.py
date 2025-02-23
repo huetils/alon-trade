@@ -3,9 +3,10 @@ import sqlite3
 import threading
 from datetime import datetime, timezone
 from queue import Queue
-from typing import Any, Coroutine, Tuple, dict, list
+from typing import Any, Coroutine, Tuple
 
 import ccxt.pro
+from ccxt.base.exchange import Exchange
 
 # Configure database
 DB_NAME: str = "orderbook_data.db"
@@ -68,13 +69,13 @@ def start_database_writer() -> None:
 
 # Fetch L1 and L2 data asynchronously using websockets
 async def fetch_order_book(exchange_id: str, symbols: list[str]) -> None:
-    exchange: Any = getattr(ccxt.pro, exchange_id)()
+    exchange: Exchange = getattr(ccxt.pro, exchange_id)()
 
     try:
         while True:
             tasks: list[asyncio.Future[Any]] = []
             for symbol in symbols:
-                tasks.append(exchange.watch_order_book(symbol))
+                tasks.append(exchange.watch_order_book(symbol))  # type: ignore
 
             # Gather all updates in parallel
             results: list[Any] = await asyncio.gather(*tasks, return_exceptions=True)
@@ -137,7 +138,7 @@ async def fetch_order_book(exchange_id: str, symbols: list[str]) -> None:
         print(f"Error in websocket for {exchange_id}: {e}")
 
     finally:
-        await exchange.close()
+        await exchange.session.close()
 
 
 # Main entry point

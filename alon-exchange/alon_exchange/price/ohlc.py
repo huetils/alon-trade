@@ -46,7 +46,7 @@ async def stream_ohlcv(
     Returns:
         None
     """
-    exchange: Any = getattr(ccxt.pro, exchange_id)()
+    exchange: Exchange = getattr(ccxt.pro, exchange_id)()
 
     try:
         while True:
