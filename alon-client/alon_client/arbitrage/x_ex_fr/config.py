@@ -18,16 +18,94 @@ def load_config(config_file: str = DEFAULT_CONFIG_FILE) -> dict[str, Any]:
 defaults: dict[str, Any] = {
     "EXCHANGES": [
         {
-            "exchange_id": "okx",
-            "api_key": os.getenv("OKX_API_KEY", ""),
-            "api_secret": os.getenv("OKX_API_SECRET", ""),
-            "api_password": os.getenv("OKX_API_PASSWORD", ""),
+            "exchange_id": "bingx",
+            "api_key": os.getenv("BINGX_API_KEY", ""),
+            "api_secret": os.getenv("BINGX_API_SECRET", ""),
+            "api_password": os.getenv("BINGX_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "bitget",
+            "api_key": os.getenv("BITGET_API_KEY", ""),
+            "api_secret": os.getenv("BITGET_API_SECRET", ""),
+            "api_password": os.getenv("BITGET_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "bitmart",
+            "api_key": os.getenv("BITMART_API_KEY", ""),
+            "api_secret": os.getenv("BITMART_API_SECRET", ""),
+            "api_password": os.getenv("BITMART_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "bitmex",
+            "api_key": os.getenv("BITMEX_API_KEY", ""),
+            "api_secret": os.getenv("BITMEX_API_SECRET", ""),
+            "api_password": os.getenv("BITMEX_API_PASSWORD", ""),
         },
         {
             "exchange_id": "bybit",
             "api_key": os.getenv("BYBIT_API_KEY", ""),
             "api_secret": os.getenv("BYBIT_API_SECRET", ""),
             "api_password": os.getenv("BYBIT_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "coinex",
+            "api_key": os.getenv("COINEX_API_KEY", ""),
+            "api_secret": os.getenv("COINEX_API_SECRET", ""),
+            "api_password": os.getenv("COINEX_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "cryptocom",
+            "api_key": os.getenv("CRYPTOCOM_API_KEY", ""),
+            "api_secret": os.getenv("CRYPTOCOM_API_SECRET", ""),
+            "api_password": os.getenv("CRYPTOCOM_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "gate",
+            "api_key": os.getenv("GATE_API_KEY", ""),
+            "api_secret": os.getenv("GATE_API_SECRET", ""),
+            "api_password": os.getenv("GATE_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "hashkey",
+            "api_key": os.getenv("HASHKEY_API_KEY", ""),
+            "api_secret": os.getenv("HASHKEY_API_SECRET", ""),
+            "api_password": os.getenv("HASHKEY_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "htx",
+            "api_key": os.getenv("HTX_API_KEY", ""),
+            "api_secret": os.getenv("HTX_API_SECRET", ""),
+            "api_password": os.getenv("HTX_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "hyperliquid",
+            "api_key": os.getenv("HYPERLIQUID_API_KEY", ""),
+            "api_secret": os.getenv("HYPERLIQUID_API_SECRET", ""),
+            "api_password": os.getenv("HYPERLIQUID_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "kucoinfutures",
+            "api_key": os.getenv("KUCOINFUTURES_API_KEY", ""),
+            "api_secret": os.getenv("KUCOINFUTURES_API_SECRET", ""),
+            "api_password": os.getenv("KUCOINFUTURES_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "mexc",
+            "api_key": os.getenv("MEXC_API_KEY", ""),
+            "api_secret": os.getenv("MEXC_API_SECRET", ""),
+            "api_password": os.getenv("MEXC_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "okx",
+            "api_key": os.getenv("OKX_API_KEY", ""),
+            "api_secret": os.getenv("OKX_API_SECRET", ""),
+            "api_password": os.getenv("OKX_API_PASSWORD", ""),
+        },
+        {
+            "exchange_id": "woo",
+            "api_key": os.getenv("WOO_API_KEY", ""),
+            "api_secret": os.getenv("WOO_API_SECRET", ""),
+            "api_password": os.getenv("WOO_API_PASSWORD", ""),
         },
     ],
     "ORDER_FILL_TIMEOUT_SEC": 5,  # Maximum time (seconds) to wait for order fulfillment
