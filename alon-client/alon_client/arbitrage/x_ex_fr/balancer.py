@@ -1,117 +1,48 @@
 import asyncio
 from decimal import Decimal
+from typing import Any, Callable, Dict
 
 import ccxt.async_support as ccxt
+from alon_client.arbitrage.x_ex_fr.logger import logger
 from ccxt.base.exchange import Exchange
 
-from alon_client.arbitrage.x_ex_fr.config import configurations
-from alon_client.arbitrage.x_ex_fr.logger import logger
 
+class BalanceManager:
+    def __init__(
+        self,
+        exchanges_config: list[dict[str, str]],
+        fetch_balance: Callable[[Exchange, str], Any],
+        transfer_funds: Callable[[Exchange, Exchange, str, Decimal], Any],
+        config: Dict[str, Any],
+    ) -> None:
+        """
+        Initializes the BalanceManager class.
 
-async def fetch_balance(exchange: Exchange, currency: str) -> Decimal:
-    """
-    Fetch the free balance of the specified currency from the exchange.
-    """
-    try:
-        balance = await exchange.fetch_balance()  # type: ignore
-        return Decimal(balance["free"].get(currency, 0))  # type: ignore
-    except Exception as e:
-        logger.error(f"[{exchange.id}] Error fetching balance: {e}")
-        return Decimal(0)
+        Args:
+            exchanges_config: List of exchange configurations.
+            fetch_balance: Function to fetch balance from an exchange.
+            transfer_funds: Function to transfer funds between exchanges.
+            config: Configuration settings.
+        """
+        self.exchanges_config = exchanges_config
+        self.fetch_balance = fetch_balance
+        self.transfer_funds = transfer_funds
+        self.config = config
+        self.exchanges: Dict[str, Exchange] = {}
 
-
-async def transfer_funds(
-    source_exchange: Exchange,
-    dest_exchange: Exchange,
-    currency: str,
-    amount: Decimal,
-) -> bool:
-    """
-    Transfer funds from one exchange to another.
-    """
-    try:
-        logger.info(
-            f"Transferring {amount} {currency} from {source_exchange.id} to {dest_exchange.id}"
-        )
-
-        # Withdraw from source exchange
-        withdrawal_tx = await source_exchange.withdraw(  # type: ignore
-            currency, float(amount), dest_exchange.id
-        )
-
-        logger.info(f"[{source_exchange.id}] Withdrawal successful: {withdrawal_tx}")
-
-        return True
-    except Exception as e:
-        logger.error(f"[{source_exchange.id}] Error transferring funds: {e}")
-        return False
-
-
-async def balance_monitor(exchanges: dict[str, Exchange]) -> None:
-    """Monitor and balance funds across exchanges to prevent liquidation.
-
-    Args:
-        exchanges (dict[str, Exchange]): A dictionary of exchanges, where the key is the exchange ID (str)
-            and the value is the Exchange object.
-
-    Returns:
-        None
-
-    Raises:
-        Exception: If an unexpected error occurs during the balancing process.
-    """
-    currency = configurations["CURRENCY"]
-    min_balance = Decimal(configurations["MIN_BALANCE_THRESHOLD"])
-    transfer_threshold = Decimal(configurations["TRANSFER_THRESHOLD"])
-
-    while True:
+    async def run(self) -> None:
+        """Initialize exchanges and start balance monitoring."""
         try:
-            balances: dict[str, Decimal] = {}
-
-            # Fetch balances for each exchange
-            for ex_id, exchange in exchanges.items():
-                balances[ex_id] = await fetch_balance(exchange, currency)
-                logger.info(f"[{ex_id}] Balance: {balances[ex_id]} {currency}")
-
-            # Identify exchanges with low and high balances
-            low_balance_exchanges: dict[str, Decimal] = {
-                ex: bal for ex, bal in balances.items() if bal < min_balance
-            }
-            high_balance_exchanges = {
-                ex: bal for ex, bal in balances.items() if bal > transfer_threshold
-            }
-
-            for low_ex, low_bal in low_balance_exchanges.items():
-                for high_ex, high_bal in high_balance_exchanges.items():
-                    if high_ex != low_ex:
-                        transfer_amount = min(
-                            high_bal - transfer_threshold, min_balance - low_bal
-                        )
-                        if transfer_amount > 0:
-                            success = await transfer_funds(
-                                exchanges[high_ex],
-                                exchanges[low_ex],
-                                currency,
-                                transfer_amount,
-                            )
-                            if success:
-                                logger.info(
-                                    f"Successfully transferred {transfer_amount} {currency} from {high_ex} to {low_ex}"
-                                )
-
-            await asyncio.sleep(configurations["BALANCE_CHECK_INTERVAL"])
+            await self._initialize_exchanges()
+            await self._balance_monitor()
         except Exception as e:
-            logger.error(f"[BALANCE_MONITOR] Unexpected error: {e}")
+            logger.error(f"[BALANCE_MANAGER] Critical error: {e}")
+        finally:
+            await self._close_exchanges()
 
-
-async def start_balance_manager(exchanges_config: list[dict[str, str]]) -> None:
-    """
-    Initialize exchanges and start balance monitoring.
-    """
-    exchanges: dict[str, Exchange] = {}
-
-    try:
-        for ex in exchanges_config:
+    async def _initialize_exchanges(self) -> None:
+        """Initializes exchanges with API credentials."""
+        for ex in self.exchanges_config:
             exchange = getattr(ccxt, ex["id"])(
                 {
                     "apiKey": ex["api_key"],
@@ -120,17 +51,110 @@ async def start_balance_manager(exchanges_config: list[dict[str, str]]) -> None:
                     "enableRateLimit": True,
                 }
             )
+            self.exchanges[ex["id"]] = exchange
 
-            exchanges[ex["id"]] = exchange
+    async def _balance_monitor(self) -> None:
+        """Monitor and balance funds across exchanges to prevent liquidation."""
+        currency = self.config["CURRENCY"]
+        min_balance = Decimal(self.config["MIN_BALANCE_THRESHOLD"])
+        transfer_threshold = Decimal(self.config["TRANSFER_THRESHOLD"])
 
-        await balance_monitor(exchanges)
-    except Exception as e:
-        logger.error(f"[BALANCE_MANAGER] Critical error: {e}")
-    finally:
-        for exchange in exchanges.values():
+        while True:
+            try:
+                balances = await self._fetch_balances(currency)
+                self._log_balances(balances, currency)
+                await self._rebalance_funds(
+                    balances, currency, min_balance, transfer_threshold
+                )
+                await asyncio.sleep(self.config["BALANCE_CHECK_INTERVAL"])
+            except Exception as e:
+                logger.error(f"[BALANCE_MONITOR] Unexpected error: {e}")
+
+    async def _fetch_balances(self, currency: str) -> Dict[str, Decimal]:
+        """Fetch balances from all exchanges."""
+        return {
+            ex_id: await self.fetch_balance(exchange, currency)
+            for ex_id, exchange in self.exchanges.items()
+        }
+
+    def _log_balances(self, balances: Dict[str, Decimal], currency: str) -> None:
+        """Logs balances in a structured format."""
+        balance_info = ", ".join(
+            [f"{ex}: {bal} {currency}" for ex, bal in balances.items()]
+        )
+        logger.info(f"Balances: {balance_info}")
+
+    async def _rebalance_funds(
+        self,
+        balances: Dict[str, Decimal],
+        currency: str,
+        min_balance: Decimal,
+        transfer_threshold: Decimal,
+    ) -> None:
+        """Rebalances funds between exchanges."""
+        low_balance_exchanges = {
+            ex: bal for ex, bal in balances.items() if bal < min_balance
+        }
+        high_balance_exchanges = {
+            ex: bal for ex, bal in balances.items() if bal > transfer_threshold
+        }
+
+        for low_ex, low_bal in low_balance_exchanges.items():
+            for high_ex, high_bal in high_balance_exchanges.items():
+                if high_ex != low_ex:
+                    transfer_amount = min(
+                        high_bal - transfer_threshold, min_balance - low_bal
+                    )
+                    if transfer_amount > 0:
+                        success = await self.transfer_funds(
+                            self.exchanges[high_ex],
+                            self.exchanges[low_ex],
+                            currency,
+                            transfer_amount,
+                        )
+                        if success:
+                            logger.info(
+                                f"Successfully transferred {transfer_amount} {currency} from {high_ex} to {low_ex}"
+                            )
+
+    async def _close_exchanges(self) -> None:
+        """Closes all exchange sessions."""
+        for exchange in self.exchanges.values():
             await exchange.session.close()
         logger.info("All exchange connections closed.")
 
 
+# Smoke Test
 if __name__ == "__main__":
-    asyncio.run(start_balance_manager(configurations["EXCHANGES"]))
+
+    async def mock_fetch_balance(exchange: Exchange, currency: str) -> Decimal:
+        return Decimal("100.0")
+
+    async def mock_transfer_funds(
+        source_exchange: Exchange,
+        dest_exchange: Exchange,
+        currency: str,
+        amount: Decimal,
+    ) -> bool:
+        return True
+
+    exchanges_config = [
+        {
+            "id": "mock",
+            "api_key": "key",
+            "api_secret": "secret",
+            "api_password": "password",
+        }
+    ]
+
+    config: dict[str, str | int] = {
+        "CURRENCY": "USDT",
+        "MIN_BALANCE_THRESHOLD": "50",
+        "TRANSFER_THRESHOLD": "150",
+        "BALANCE_CHECK_INTERVAL": 10,
+    }
+
+    balance_manager = BalanceManager(
+        exchanges_config, mock_fetch_balance, mock_transfer_funds, config
+    )
+    asyncio.run(balance_manager.run())
