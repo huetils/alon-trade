@@ -1,6 +1,7 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from decimal import Decimal
+from typing import Any
 
 from ccxt.base.exchange import Exchange
 
@@ -19,58 +20,19 @@ class Position:
 open_positions: dict[str, Position] = {}
 
 
-async def robust_fetch_balance(exchange: Exchange) -> float:
-    """
-    Fetches the free balance for USDT with retry logic.
-    """
+async def fetch_balance(exchange: Any, currency: str) -> Decimal:
+    """Fetches balance from the given exchange."""
     attempts = 0
     while attempts < configurations["FETCH_BALANCE_MAX_RETRIES"]:
         try:
             balance = await exchange.fetch_balance()  # type: ignore
-            return balance["free"].get(configurations["CURRENCY"], 0.0)  # type: ignore
+            return Decimal(balance["free"].get(currency, 0))  # type: ignore
         except Exception as e:
-            logger.error(f"[robust_fetch_balance] Error fetching balance: {e}")
+            logger.error(f"[{exchange.id}] Error fetching balance: {e}")
             attempts += 1
             await asyncio.sleep(2**attempts)
-    return 0.0
 
-
-async def try_open_position(exchange: Exchange, symbol: str, direction: str) -> None:
-    """
-    Opens a position using a market order.
-    """
-    if symbol in open_positions:
-        logger.info(f"[{symbol}] Position already open. Skipping...")
-        return
-
-    try:
-        free_balance = await robust_fetch_balance(exchange)
-        trade_amount: float = (
-            configurations["TRADE_AMOUNT_PERCENT"] / 100.0
-        ) * free_balance
-
-        if trade_amount <= 0:
-            logger.error(f"[{symbol}] Insufficient balance to open a position.")
-            return
-
-        side = "buy" if direction == "long" else "sell"
-        await exchange.create_market_order(  # type: ignore
-            symbol, side, trade_amount, params={"reduceOnly": False}
-        )
-
-        open_positions[symbol] = Position(
-            symbol=symbol,
-            direction=direction,
-            size=trade_amount,
-            funding_time=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
-        )
-
-        logger.info(
-            f"[{symbol}] Opened {direction.upper()} position of {trade_amount}."
-        )
-
-    except Exception as e:
-        logger.exception(f"[{symbol}] Error opening position: {e}")
+    return Decimal(0)
 
 
 async def close_position(exchange: Exchange, symbol: str) -> None:
@@ -94,3 +56,67 @@ async def close_position(exchange: Exchange, symbol: str) -> None:
 
     except Exception as e:
         logger.exception(f"[{symbol}] Error closing position: {e}")
+
+
+async def transfer_funds(
+    source_exchange: Exchange,
+    dest_exchange: Exchange,
+    currency: str,
+    amount: Decimal,
+) -> bool:
+    """
+    Transfers funds from one exchange to another.
+
+    Args:
+        source_exchange (Exchange): The exchange to withdraw from.
+        dest_exchange (Exchange): The exchange to deposit to.
+        currency (str): The currency to transfer.
+        amount (Decimal): The amount to transfer.
+
+    Returns:
+        bool: True if transfer was initiated successfully, False otherwise.
+    """
+    try:
+        logger.info(
+            f"Initiating transfer of {amount} {currency} from {source_exchange.id} to {dest_exchange.id}"
+        )
+
+        # Fetch deposit address from destination exchange
+        deposit_address_info: dict[str, Any] = dict(
+            await dest_exchange.fetch_deposit_address(currency)  # type: ignore
+        )
+
+        deposit_address: str | None = deposit_address_info["address"]  # type: ignore
+        tag = deposit_address_info.get(  # type: ignore
+            "tag", None
+        )  # Some currencies require a tag/memo
+
+        if not deposit_address:
+            logger.error(
+                f"[{dest_exchange.id}] No deposit address found for {currency}"
+            )
+            return False
+
+        logger.info(
+            f"[{dest_exchange.id}] Deposit address for {currency}: {deposit_address} (Tag: {tag})"
+        )
+
+        # Withdraw funds from source exchange to the deposit address
+        withdrawal_params: dict[str, float | str] = {
+            "address": deposit_address,
+            "amount": float(amount),
+        }
+
+        if tag:
+            withdrawal_params["tag"] = tag
+
+        withdrawal_tx = await source_exchange.withdraw(  # type: ignore
+            currency, float(amount), deposit_address, tag
+        )
+
+        logger.info(f"[{source_exchange.id}] Withdrawal successful: {withdrawal_tx}")
+
+        return True
+    except Exception as e:
+        logger.error(f"[{source_exchange.id}] Error transferring funds: {e}")
+        return False

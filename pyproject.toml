@@ -6,10 +6,11 @@ authors = ["Hju Kneyck Flores <hjucode@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-ruff = "^0.9.7"
 
 [tool.poetry.group.dev.dependencies]
+pyright = "^1.1.394"
 pytest = "^8.0"
+ruff = "^0.9.7"
 
 [tool.poetry.extras]
 all = ["alon_client", "alon_exchange", "alon_model"]

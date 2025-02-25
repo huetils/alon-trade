@@ -3,8 +3,9 @@ from decimal import Decimal
 from typing import Any, Callable, Dict
 
 import ccxt.async_support as ccxt
-from alon_client.arbitrage.x_ex_fr.logger import logger
 from ccxt.base.exchange import Exchange
+
+from alon_client.arbitrage.x_ex_fr.logger import logger
 
 
 class BalanceManager:
@@ -55,7 +56,7 @@ class BalanceManager:
 
     async def _balance_monitor(self) -> None:
         """Monitor and balance funds across exchanges to prevent liquidation."""
-        currency = self.config["CURRENCY"]
+        currency = self.config["QUOTE_CURRENCY"]
         min_balance = Decimal(self.config["MIN_BALANCE_THRESHOLD"])
         transfer_threshold = Decimal(self.config["TRANSFER_THRESHOLD"])
 
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     ]
 
     config: dict[str, str | int] = {
-        "CURRENCY": "USDT",
+        "QUOTE_CURRENCY": "USDT",
         "MIN_BALANCE_THRESHOLD": "50",
         "TRANSFER_THRESHOLD": "150",
         "BALANCE_CHECK_INTERVAL": 10,

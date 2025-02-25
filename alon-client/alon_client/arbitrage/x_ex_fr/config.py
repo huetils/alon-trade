@@ -115,7 +115,7 @@ defaults: dict[str, Any] = {
     "TRADE_AMOUNT_PERCENT": 1.0,  # Percentage of balance allocated per trade
     "LEVERAGE_LIMIT": 10,  # Maximum leverage allowed for trades
     "TOP_OPPORTUNITIES": 5,  # Number of top arbitrage opportunities to consider
-    "CURRENCY": "USDT",  # Base currency for balance monitoring and transfers
+    "QUOTE_CURRENCY": "USDC",  # Base currency for balance monitoring and transfers
     "FUNDING_INTERVAL_HOURS": 8,  # Interval (hours) for funding rate updates
     "CHECK_INTERVAL": 1,  # Interval (seconds) for monitoring funding rates
     "TIME_TO_FUNDING_THRESHOLD": 5,  # Minimum hours before funding payout to consider a trade
